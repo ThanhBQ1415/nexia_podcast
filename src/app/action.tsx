@@ -15,13 +15,25 @@ export async function createUser(prevState: any, formData: FormData) {
 }
 
 export async function loginUser(prevState: any, formData: FormData) {
-    const res = await fetch("")
-    const json = await res.json
+    // Send login request to authentication endpoint
+    const res = await fetch("/api/auth/login", {
+        method: "POST",
+        body: formData,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+
+    // Parse response
+    const json = await res.json()
+
+    // Handle authentication errors
     if (!res.ok) {
         return {
-            message: "Please enter a valid email"
+            message: "Invalid email or password" 
         }
     }
-    redirect('/dashboard')
 
+    // Redirect to dashboard on successful login
+    redirect('/dashboard')
 }

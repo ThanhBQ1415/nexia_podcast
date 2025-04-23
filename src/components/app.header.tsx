@@ -3,16 +3,19 @@ import React from 'react';
 
 const AppHeader: React.FC = () => {
   return (
-    <header className="bg-[#1a1a1a] px-4 py-2 flex items-center justify-between">
+    <header className="bg-[#1a1a1a] px-4 py-2 flex items-center justify-between ">
       {/* Logo section */}
       <div className="flex items-center">
-        <div className="w-10 h-10">
+        <button 
+          onClick={() => window.location.href = '/'} 
+          className="w-10 h-10"
+        >
           <img 
             src="/app.header/headphone-logo.png" 
             alt="Headphone Logo" 
             className="object-contain w-full h-full"
           />
-        </div>
+        </button>
       </div>
 
       {/* Search section */}
