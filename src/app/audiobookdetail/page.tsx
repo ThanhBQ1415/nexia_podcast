@@ -101,7 +101,7 @@ export default function AudiobookDetail() {
             <span className="text-2xl font-bold">{product.scoreContent}/5</span>
             <div className="flex text-yellow-500">
               {'★'.repeat(Math.floor(product.scoreContent))}
-              {product.scoreContent % 1 !== 0 && '½'}
+              {product.scoreContent % 1 !== 0 && '⯨'}
               {'☆'.repeat(5 - Math.ceil(product.scoreContent))}
             </div>
           </div>

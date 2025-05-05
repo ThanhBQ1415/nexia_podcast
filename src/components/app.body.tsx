@@ -12,7 +12,7 @@ import {
     setBlogToEdit
 } from '@/app/Redux/blogSlice';
 
-interface IProps {
+interface IProps {                                                                                                                                                                                                                                               
     blogs: IBlog[]
 }
 
