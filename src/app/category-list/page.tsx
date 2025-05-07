@@ -28,21 +28,23 @@ interface CateItem {
 export default function CategoryListPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const categoryId = searchParams.get('categoryId') || 'all'; // Lấy categoryId từ URL
   const categoryName = searchParams.get('name') || 'Sách nói chất lượng';
   const [categoryItems, setCategoryItems] = useState<CateItem[]>([]);
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState(categoryId); // Khởi tạo activeTab bằng categoryId từ URL
   const [showSortDialog, setShowSortDialog] = useState(false);
   const [sortBy, setSortBy] = useState('all'); // Thêm state để theo dõi tiêu chí sắp xếp
+  const [originalItems, setOriginalItems] = useState<CateItem[]>([]); // Thêm state để lưu danh sách gốc
 
   // Danh sách các thể loại
   const categories = [
     { id: 'all', name: 'Tất cả', icon: '/iconcategory-list/all-icon.png' },
-    { id: 'tamlinh', name: 'Tâm linh', icon: '/iconcategory-list/tamlinh-icon.png' },
-    { id: 'hoiky', name: 'Hồi ký và tiểu sử', icon: '/iconcategory-list/hoiky-icon.png' },
-    { id: 'kinhte', name: 'Kinh tế', icon: '/iconcategory-list/kinhte-icon.png' },
-    { id: 'taichinh', name: 'Tài chính, đầu tư', icon: '/iconcategory-list/taichinh-icon.png' },
-    { id: 'lichsu', name: 'Lịch sử, Văn hoá', icon: '/iconcategory-list/lichsu-icon.png' },
-    { id: 'quanly', name: 'Quản lý công ty', icon: '/iconcategory-list/quanly-icon.png' },
+    { id: '1', name: 'Tâm linh', icon: '/iconcategory-list/tamlinh-icon.png' },
+    { id: '2', name: 'Hồi ký và tiểu sử', icon: '/iconcategory-list/hoiky-icon.png' },
+    { id: '3', name: 'Kinh tế', icon: '/iconcategory-list/kinhte-icon.png' },
+    { id: '4', name: 'Tài chính, đầu tư', icon: '/iconcategory-list/taichinh-icon.png' },
+    { id: '5', name: 'Lịch sử, Văn hoá', icon: '/iconcategory-list/lichsu-icon.png' },
+    { id: '6', name: 'Quản lý công ty', icon: '/iconcategory-list/quanly-icon.png' },
   ];
 
   // Danh sách các tùy chọn sắp xếp
@@ -56,38 +58,55 @@ export default function CategoryListPage() {
   useEffect(() => {
     const fetchCategoryItems = async () => {
       try {
+        // Xây dựng URL với tham số thể loại nếu không phải 'all'
         let url = 'http://192.168.1.88:8386/nexia-service/v1/common/category?page=0&size=10&type=1';
-        if (sortBy === 'newest') {
-          url += '&sort=publisherDate:desc';
-        } else if (sortBy === 'oldest') {
-          url += '&sort=publisherDate:asc';
-        } else {
-          url += '&sort=id:asc';
+        
+        // Thêm tham số categoryId nếu activeTab không phải 'all'
+        if (activeTab !== 'all') {
+          url += `&categoryId=${activeTab}`;
         }
+        
+        // Luôn lấy dữ liệu theo id:asc để đảm bảo thứ tự nhất quán
+        url += '&sort=id:asc';
+        
+        console.log('Fetching URL:', url);
+        
         const response = await fetch(url);
         const data = await response.json();
         if (data.code === 200) {
-          let items = data.data.cateItem;
+          const items = data.data.cateItem;
+          // Lưu danh sách gốc
+          setOriginalItems(items);
+          
+          // Xử lý sắp xếp dựa trên sortBy
+          let sortedItems = [...items];
+          
           if (sortBy === 'newest') {
-            // Sắp xếp tăng dần theo publisherDate (ngày cũ lên trước)
-            items = [...items].sort((a, b) => {
-              const [da, ma, ya] = a.publisherDate.split('/').map(Number);
-              const [db, mb, yb] = b.publisherDate.split('/').map(Number);
-              const dateA = new Date(ya, ma - 1, da);
-              const dateB = new Date(yb, mb - 1, db);
-              return dateA.getTime() - dateB.getTime();
-            });
-          } else if (sortBy === 'oldest') {
             // Sắp xếp giảm dần theo publisherDate (ngày mới lên trước)
-            items = [...items].sort((a, b) => {
+            sortedItems = sortedItems.sort((a, b) => {
               const [da, ma, ya] = a.publisherDate.split('/').map(Number);
               const [db, mb, yb] = b.publisherDate.split('/').map(Number);
               const dateA = new Date(ya, ma - 1, da);
               const dateB = new Date(yb, mb - 1, db);
               return dateB.getTime() - dateA.getTime();
             });
+            console.log('Danh sách sau khi sắp xếp mới nhất:', sortedItems);
+          } else if (sortBy === 'oldest') {
+            // Sắp xếp tăng dần theo publisherDate (ngày cũ lên trước)
+            sortedItems = sortedItems.sort((a, b) => {
+              const [da, ma, ya] = a.publisherDate.split('/').map(Number);
+              const [db, mb, yb] = b.publisherDate.split('/').map(Number);
+              const dateA = new Date(ya, ma - 1, da);
+              const dateB = new Date(yb, mb - 1, db);
+              return dateA.getTime() - dateB.getTime();
+            });
+            console.log('Danh sách sau khi sắp xếp cũ nhất:', sortedItems);
+          } else {
+            // Nếu là 'all', sử dụng danh sách gốc
+            console.log('Hiển thị danh sách gốc:', sortedItems);
           }
-          setCategoryItems(items);
+          
+          setCategoryItems(sortedItems);
         }
       } catch (error) {
         console.error('Error fetching category items:', error);
@@ -119,8 +138,8 @@ export default function CategoryListPage() {
   };
 
   const handleSortOptionClick = (option: string) => {
-    // Xử lý khi người dùng chọn tùy chọn sắp xếp
     console.log(`Sắp xếp theo: ${option}`);
+    setSortBy(option);
     setShowSortDialog(false);
   };
 

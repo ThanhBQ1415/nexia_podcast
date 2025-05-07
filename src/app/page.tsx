@@ -2,6 +2,7 @@
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import React from 'react';
 
 interface CateItem {
   id: number;
@@ -108,7 +109,7 @@ export default function Home() {
       <div className="flex justify-center mt-4 space-x-2">
         {images.map((_, index) => (
           <div
-            key={index}
+            key={index} // Thêm thuộc tính key với giá trị index
             onClick={() => handleSlideChange(index)}
             className={`h-3 rounded-full cursor-pointer transition-all duration-300 ${
               index === currentSlide ? 'bg-green-500 w-13' : 'bg-gray-700 hover:bg-gray-600 w-3'
@@ -119,7 +120,7 @@ export default function Home() {
         ))}
       </div>
 
-      <div className="bg-[#0f0f0f] p-4 rounded-lg w-full mt-6">
+      <div className="bg-[#0f0f0f] p-4 rounded-lg w-full mt-4">
         <div className="flex justify-between items-center mb-3">
           <h2 className="text-base font-semibold text-white">Thể loại</h2>
           <button 
@@ -176,7 +177,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="bg-[#0f0f0f] p-4 rounded-lg w-full mt-6">
+      <div className="bg-[#0f0f0f] p-4 rounded-lg w-full ">
         <div className="flex justify-between items-center mb-3">
           <h2 className="text-base font-semibold text-white">Trending</h2>
           <button className="text-xl text-white">{'>'}</button>
@@ -199,7 +200,7 @@ export default function Home() {
                   />
                   {item.isHot === 1 && (
                     <div className="absolute top-2 right-2 px-2 py-1 text-xs text-white bg-yellow-500 rounded-full">
-                      HOT
+                    HOT
                     </div>
                   )}
                 </div>
@@ -221,7 +222,7 @@ export default function Home() {
       </div>
 
       {/* Phần Tâm linh - Tinh thần */}
-      <div className="bg-[#0f0f0f] p-4 rounded-lg w-full mt-6">
+      <div className="bg-[#0f0f0f] p-4 rounded-lg w-full ">
         <div className="flex justify-between items-center mb-3">
           <h2 className="text-base font-semibold text-white">Tâm linh - Tinh thần</h2>
           <button className="text-xl text-white">{'>'}</button>
@@ -266,7 +267,7 @@ export default function Home() {
       </div>
 
       {/* Phần Kinh doanh - Khởi nghiệp */}
-      <div className="bg-[#0f0f0f] p-4 rounded-lg w-full mt-6">
+      <div className="bg-[#0f0f0f] p-4 rounded-lg w-full ">
         <div className="flex justify-between items-center mb-3">
           <h2 className="text-base font-semibold text-white">Kinh doanh - Khởi nghiệp</h2>
           <button className="text-xl text-white">{'>'}</button>
@@ -309,6 +310,93 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Nút VIP */}
+      <div className="bg-[#0f0f0f] p-4 rounded-lg w-full ">
+        <button 
+          className="w-full bg-[#FFA500] text-white py-3 rounded-lg font-medium text-center"
+          onClick={() => router.push('/vip-subscription')}
+        >
+          Nghe VIP chỉ từ 8.999 đ
+        </button>
+      </div>
+
+      {/* Banner World Book Day */}
+      <div className="bg-[#0f0f0f] p-0 md:p-4 rounded-lg w-full">
+        <div className="relative w-screen left-[calc(-50vw+50%)] md:left-0 md:w-[1372px] h-[180px] md:h-[400px] overflow-hidden md:mx-auto">
+          <div className="absolute inset-0">
+            <Image
+              src="/app.body/world-book-day.png"
+              alt="World Book Day"
+              fill
+              className="object-contain md:object-fill"
+              sizes="(max-width: 768px) 100vw, 1372px"
+              priority
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Danh sách sách mới */}
+      <div className="bg-[#0f0f0f] p-4 rounded-lg w-full">
+  <div className="flex flex-col gap-4">
+    {businessItems.map((item, index) => (
+      <React.Fragment key={item.id}>
+        <button
+          className="flex gap-4 items-center w-full text-left focus:outline-none"
+          onClick={() => handleBookClick(item)}
+        >
+          <div className="relative w-[120px] h-[120px] rounded-lg overflow-hidden">
+            <Image
+              src={`/app.body/sach${index + 1}.png`}
+              alt={item.name}
+              fill
+              className="object-cover"
+              sizes="120px"
+            />
+            <div className="absolute top-0 right-0 px-2 py-1 text-xs text-white bg-[#8B5CF6] rounded-bl-lg">
+              FREE
+            </div>
+          </div>
+          <div className="flex-1">
+            <h3 className="text-sm text-white line-clamp-1">{item.name}</h3>
+            <div className="flex gap-2 items-center mt-1">
+              <div className="flex items-center">
+                <Image
+                  src="/app.body/tacgia.png"
+                  alt="Author"
+                  width={30}
+                  height={30}
+                />
+                <span className="ml-1 text-xs text-gray-400">Keith D.Harrell</span>
+              </div>
+            </div>
+            <div className="flex items-center mt-1">
+              <div className="flex items-center">
+                <Image
+                  src="/app.body/star.png"
+                  alt="Star Rating"
+                  width={20}
+                  height={20}
+                />
+              </div>
+              <span className="ml-1 text-xs text-gray-400">
+                {item.scoreContent.toFixed(1)} ({item.totalListen})
+              </span>
+            </div>
+            <div className="mt-1 text-xs text-gray-400 line-clamp-1">
+              {item.description}
+            </div>
+          </div>
+        </button>
+        {index < businessItems.length - 1 && (
+          <div className="w-full h-[1px] bg-gray-800"></div>
+        )}
+      </React.Fragment>
+    ))}
+  </div>
+</div>
+
 
     </main>
   );

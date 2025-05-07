@@ -108,14 +108,7 @@ export default function AudiobookDetail() {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#282828] flex gap-4">
-        <button className="flex-1 bg-[#1a1a1a] text-white py-3 rounded-full font-medium">
-          Mua lẻ gói
-        </button>
-        <button className="flex-1 py-3 font-medium text-white bg-green-500 rounded-full">
-          Mua gói VIP
-        </button>
-      </div>
+     
     </main>
   );
 }

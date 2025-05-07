@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  images: {
-    domains: ['freeimg.umusic.la'],
-  },
+  // Enable service workers
+  experimental: {
+    serviceWorkers: true
+  }
 }
 
 module.exports = nextConfig

@@ -25,7 +25,8 @@ export default function CategoryPage() {
   };
 
   const handleCategoryClick = (categoryId: number) => {
-    router.push(`/category-list`);
+    // Truyền categoryId qua URL
+    router.push(`/category-list?categoryId=${categoryId}&name=${encodeURIComponent(categories.find(c => c.id === categoryId)?.name || '')}`);
   };
 
   return (
