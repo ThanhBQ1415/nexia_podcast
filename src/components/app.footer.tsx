@@ -1,12 +1,19 @@
 'use client'
 import Image from 'next/image';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 function Appfooter() {
     const [activeButton, setActiveButton] = useState<string | null>(null);
+    const router = useRouter();
 
     const handleButtonClick = (buttonName: string) => {
         setActiveButton(buttonName);
+        if (buttonName === 'Audiobook') {
+            router.push('/'); // Điều hướng đến trang chủ
+        } else if (buttonName === 'Podcast') {
+            router.push('/podcast'); // Điều hướng đến trang podcast
+        }
     };
 
     return (

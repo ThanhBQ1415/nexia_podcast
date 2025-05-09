@@ -88,7 +88,7 @@ export default function Home() {
   }, []);
 
   const handleBookClick = (book: CateItem) => {
-    router.push(`audiobookdetail?product=${JSON.stringify(book)}`);
+    router.push(`audiobookdetail?id=${book.id}`);
   };
 
   return (

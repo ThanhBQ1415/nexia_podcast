@@ -126,7 +126,7 @@ export default function CategoryListPage() {
   };
 
   const handleBookClick = (book: CateItem) => {
-    router.push(`/audiobookdetail?id=${book.id}`);
+    router.push(`/audiobookdetail?product=${JSON.stringify(book)}`);
   };
 
   const handleTabChange = (tab: string) => {

@@ -1,4 +1,4 @@
-/* Import Tailwind directives - phải nằm đầu tiên */
+
 @import 'tailwindcss';
 
 @tailwind base;
@@ -33,4 +33,38 @@ body {
 } */
 .filter-green-500 {
   filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%);
+}
+
+.rounded-full {
+  border-radius: 9999px;
+}
+
+.text-xs {
+  font-size: 0.75rem; /* 12px */
+}
+
+.text-sm {
+  font-size: 0.875rem; /* 14px */
+}
+
+.text-base {
+  font-size: 0.95rem; /* 16px */
+}
+
+.text-lg {
+  font-size: 1.125rem; /* 18px */
+}
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+.max-w-lg {
+  max-width: 32rem; /* 512px */
 }

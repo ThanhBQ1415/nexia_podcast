@@ -1,12 +1,11 @@
-// redux/store.ts
-import { configureStore } from '@reduxjs/toolkit'
-import blogReducer from './blogSlice'
+import { configureStore } from '@reduxjs/toolkit';
+import audiobookReducer from './Features/audiobookSlice';
 
 export const store = configureStore({
   reducer: {
-    blog: blogReducer
-  }
-})
+    audiobook: audiobookReducer,
+  },
+});
 
-export type RootState = ReturnType<typeof store.getState>
-export type AppDispatch = typeof store.dispatch
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
