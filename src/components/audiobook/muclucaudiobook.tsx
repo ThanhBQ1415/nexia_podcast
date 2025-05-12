@@ -1,7 +1,9 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { useRouter } from 'next/navigation';
 import type { RootState } from '../../app/Redux/Store';
+import { setChapterId } from '../../app/Redux/Features/audiobookSlice';
 
 interface Chapter {
   id: number;
@@ -19,6 +21,8 @@ interface Chapter {
 }
 
 const MucLuc = () => {
+  const dispatch = useDispatch();
+  const router = useRouter();
   const bookId = useSelector((state: RootState) => state.audiobook.bookId);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,10 +68,19 @@ const MucLuc = () => {
     return <div className="text-center text-gray-400">Không có chương nào</div>;
   }
 
+  const handleChapterClick = (chapterId: number) => {
+    dispatch(setChapterId(chapterId));
+    router.push('/phat-audiobook');
+  };
+
   return (
     <div className="space-y-2 divide-y divide-[#2F3443]">
       {chapters.map((chapter) => (
-        <div key={chapter.id} className="flex items-center gap-3 text-[#BDBDBD] py-2">
+        <div 
+          key={chapter.id} 
+          className="flex items-center gap-3 text-[#BDBDBD] py-2 cursor-pointer hover:bg-[#2F3443]"
+          onClick={() => handleChapterClick(chapter.id)}
+        >
           <span className="flex-1 text-sm">
             {chapter.number.toString().padStart(2, '0')}. {chapter.title}
           </span>
