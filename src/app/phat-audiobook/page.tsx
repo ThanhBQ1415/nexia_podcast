@@ -59,7 +59,12 @@ export default function PhatAudiobook() {
   const [error, setError] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
+  const [showChapterList, setShowChapterList] = useState(false);
+  const [showSpeedModal, setShowSpeedModal] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const [showtimemodal, setShowTimerModal] = useState(false);
   const router = useRouter();
+  const [selectedTimer, setSelectedTimer] = useState<string | number>('Không hẹn giờ');
   useEffect(() => {
     const fetchAudiobookDetail = async () => {
       if (!bookId) {
@@ -170,7 +175,7 @@ export default function PhatAudiobook() {
   
   // In the JSX, remove the audio element
   return (
-    <div className="relative min-h-screen bg-[#181A20] text-white">
+    <div className="relative min-h-screen bg-[#181A20] text-white pb-16">
       {/* Remove this:
       <audio
         ref={audioRef}
@@ -310,8 +315,232 @@ export default function PhatAudiobook() {
               />
             </button>
           </div>
+
+          {/* Function Buttons */}
+          <div className="flex justify-center items-center mt-8 w-full max-w-lg">
+            <div className="flex gap-x-14 justify-center items-center w-full max-w-lg">
+              <button 
+                onClick={() => setShowChapterList(true)} 
+                className="flex flex-col gap-2 items-center"
+              >
+                <Image
+                  src="/app.body/mucluc.png"
+                  alt="Mục lục"
+                  width={20}
+                  height={20}
+                />
+                <span className="text-xs text-[#BDBDBD]">Mục lục</span>
+              </button>
+
+              <button 
+                onClick={() => setShowSpeedModal(true)} 
+                className="flex flex-col gap-2 items-center"
+              >
+                <Image
+                  src="/app.body/tocdo.png"
+                  alt="Tốc độ"
+                  width={20}
+                  height={20}
+                />
+                <span className="text-xs text-[#BDBDBD]">Tốc độ ({playbackSpeed}x)</span>
+              </button>
+
+              <button 
+                    onClick={() => setShowTimerModal(true)} 
+              className="flex flex-col gap-2 items-center">
+                <Image
+                  src="/app.body/hengio.png"
+                  alt="Hẹn giờ"
+                  width={20}
+                  height={20}
+                />
+                <span className="text-xs text-[#BDBDBD]">Hẹn giờ</span>
+              </button>
+
+              <button className="flex flex-col gap-2 items-center">
+                <Image
+                  src="/app.body/taixuong.png"
+                  alt="Tải xuống"
+                  width={20}
+                  height={20}
+                />
+                <span className="text-xs text-[#BDBDBD]">Tải xuống</span>
+              </button>
+
+              <button className="flex flex-col gap-2 items-center">
+                <Image
+                  src="/app.body/chatluong.png"
+                  alt="Chất lượng"
+                  width={20}
+                  height={20}
+                />
+                <span className="text-xs text-[#BDBDBD]">Chất lượng</span>
+              </button>
+            </div>
+          </div>
+          
+
+          <div className="flex justify-center items-center mt-4 w-full max-w-lg">
+            <div className="flex gap-4 items-center">
+              <Image
+                src="/app.body/phat-audiobook.png"  // Updated image source
+                alt={currentChapter?.title || 'Chapter Image'}
+                width={50}
+                height={50}
+                className="rounded-full"
+              />
+              <div>
+                <span className="text-lg text-white">{currentChapter?.title}</span>
+                <div className="flex items-center text-[#E0E0E0] mt-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                  <span className="ml-2">{audiobook?.totalFollow || 0} Đánh dấu</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Speed Modal */}
+      {showSpeedModal && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 transition-opacity duration-300">
+          <div 
+            className="fixed bottom-0 left-0 right-0 bg-[#35383F] rounded-t-[20px] transition-transform duration-300 transform translate-y-0"
+            style={{ maxHeight: '70vh', overflowY: 'auto' }}
+          >
+            <div className="flex justify-between items-center p-4 border-b border-[#2F3443] pt-6">
+              <span className="text-[#E0E0E0] text-sm">Tốc độ phát</span>
+              <button onClick={() => setShowSpeedModal(false)} className="text-[#E0E0E0]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            <div className="p-4">
+              {[0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((speed) => (
+                <div
+                  key={speed}
+                  onClick={() => setPlaybackSpeed(speed)}
+                  className="flex justify-between items-center p-3 cursor-pointer hover:bg-[#2F3443] rounded-lg border-b border-[#2F3443]"
+                >
+                  <span className="text-sm text-white">{speed}X</span>
+                  <Image
+                    src={playbackSpeed === speed ? '/app.body/checkbox2.png' : '/app.body/checkbox.png'}
+                    alt="Checkbox"
+                    width={20}
+                    height={20}
+                  />
+                </div>
+              ))}
+              <button
+                onClick={() => setShowSpeedModal(false)}
+                className="w-full mt-4 py-3 bg-[#06C149] text-white rounded-full font-medium"
+              >
+                Đồng ý
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+{showtimemodal && (
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 transition-opacity duration-300">
+      <div 
+        className="fixed bottom-0 left-0 right-0 bg-[#35383F] rounded-t-[20px] transition-transform duration-300 transform translate-y-0"
+        style={{ maxHeight: '70vh', overflowY: 'auto' }}
+      >
+        <div className="flex justify-between items-center p-4 border-b border-[#2F3443] pt-6">
+          <span className="text-[#E0E0E0] text-sm">Hẹn giờ</span>
+          <button onClick={() => setShowTimerModal(false)} className="text-[#E0E0E0]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div className="p-4">
+          {['Không hẹn giờ', 5, 10, 20, 30, 60].map((option, index) => (
+            <div
+              key={index}
+              onClick={() => setSelectedTimer(option)}
+              className="flex justify-between items-center p-3 cursor-pointer hover:bg-[#2F3443] rounded-lg border-b border-[#2F3443]"
+            >
+              <span className="text-sm text-white">{typeof option === 'number' ? `${option} phút` : option}</span>
+              <Image
+                src={selectedTimer === option ? '/app.body/checkbox2.png' : '/app.body/checkbox.png'}
+                alt="Checkbox"
+                width={20}
+                height={20}
+              />
+            </div>
+          ))}
+          <button
+            onClick={() => setShowTimerModal(false)}
+            className="w-full mt-4 py-3 bg-[#06C149] text-white rounded-full font-medium"
+          >
+            Đồng ý
+          </button>
+        </div>
+      </div>
+    </div>
+  )}
+
+
+
+      {/* Chapter List Modal */}
+      {showChapterList && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 transition-opacity duration-300">
+          <div 
+            className="fixed bottom-0 left-0 right-0 bg-[#181A20] rounded-t-[20px] transition-transform duration-300 transform translate-y-0"
+            style={{ maxHeight: '70vh' }}
+          >
+            <div className="flex justify-between items-center p-4 border-b border-[#2F3443] pt-6">
+              <span className="text-[#E0E0E0] text-sm">{chapters.length} tập</span>
+              <h2 className="text-lg font-semibold text-white">Danh sách tập</h2>
+              <button className="text-[#E0E0E0]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                  <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                  <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                </svg>
+              </button>
+            </div>
+            <div className="overflow-y-auto p-4" style={{ maxHeight: 'calc(70vh - 60px)' }}>
+              {chapters.map((chapter) => (
+                <div
+                  key={chapter.id}
+                  onClick={() => {
+                    setCurrentChapter(chapter);
+                    setShowChapterList(false);
+                    setCurrentTime(0);
+                    setIsPlaying(true);
+                  }}
+                  className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-[#2F3443] ${currentChapter?.id === chapter.id ? 'bg-[#2F3443]' : ''}`}
+                >
+                  <span className="text-sm text-white">
+                    {chapter.number.toString().padStart(2, '0')}. {chapter.title}
+                  </span>
+                  <div className="flex items-center gap-1 ml-auto text-[#BDBDBD]">
+                    <Image
+                      src="/app.body/dongho.png"
+                      alt="clock"
+                      width={12}
+                      height={12}
+                    />
+                    <span className="text-xs">
+                      {Math.floor(chapter.duration / 60)}:{Math.floor(chapter.duration % 60).toString().padStart(2, '0')}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

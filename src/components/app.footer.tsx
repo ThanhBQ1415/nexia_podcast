@@ -13,6 +13,8 @@ function Appfooter() {
             router.push('/'); // Điều hướng đến trang chủ
         } else if (buttonName === 'Podcast') {
             router.push('/podcast'); // Điều hướng đến trang podcast
+        }else if (buttonName === 'Cá nhân') {
+            router.push('/canhan'); // Điều hướng đến trang podcast
         }
     };
 
