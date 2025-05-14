@@ -1,7 +1,9 @@
 import React from 'react';
-// Remove FaBell import since we'll use static image
+import { useRouter } from 'next/navigation';
 
 const AppHeader: React.FC = () => {
+  const router = useRouter();
+
   return (
     <header className="bg-[#1a1a1a] px-4 py-2 flex items-center justify-between ">
       {/* Logo section */}
@@ -24,7 +26,9 @@ const AppHeader: React.FC = () => {
           <input
             type="text"
             placeholder="Tìm kiếm..."
-            className="w-full bg-[#1e1e1e] text-gray-200 px-8 py-2.5 pl-10 text-sm focus:outline-none focus:ring-1 focus:ring-gray-600 placeholder:text-gray-500"
+            className="w-full bg-[#1e1e1e] text-gray-200 px-8 py-2.5 pl-10 text-sm focus:outline-none focus:ring-1 focus:ring-gray-600 placeholder:text-gray-500 cursor-pointer"
+            onClick={() => router.push('/search')}
+            readOnly
           />
           <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
             <img 

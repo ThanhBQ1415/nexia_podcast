@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 function Appfooter() {
-    const [activeButton, setActiveButton] = useState<string | null>(null);
+    const [activeButton, setActiveButton] = useState<string | null>('Audiobook');
     const router = useRouter();
 
     const handleButtonClick = (buttonName: string) => {

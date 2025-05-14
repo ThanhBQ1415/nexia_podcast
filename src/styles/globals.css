@@ -42,7 +42,9 @@ body {
 .text-xs {
   font-size: 0.75rem; /* 12px */
 }
-
+.text-ks {  
+  font-size: 0.75rem; /* 12px */
+}
 .text-sm {
   font-size: 0.875rem; /* 14px */
 }
