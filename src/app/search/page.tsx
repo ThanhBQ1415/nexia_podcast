@@ -2,10 +2,26 @@
 
 import { useRouter} from 'next/navigation';
 import { useState } from 'react';
+interface Category {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+}
+
 export default function SearchPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('audiobook');
   const [searchTerm, setSearchTerm] = useState('');
+  
+  const categories: Category[] = [
+    { id: '1', name: 'Tâm linh', icon: '/iconcategory-list/tamlinh-icon.png', color: 'bg-purple-500' },
+    { id: '2', name: 'Hồi ký và tiểu sử', icon: '/iconcategory-list/hoiky-icon.png', color: 'bg-orange-500' },
+    { id: '3', name: 'Kinh tế', icon: '/iconcategory-list/kinhte-icon.png', color: 'bg-yellow-500' },
+    { id: '4', name: 'Tài chính, đầu tư', icon: '/iconcategory-list/taichinh-icon.png', color: 'bg-blue-500' },
+    { id: '5', name: 'Lịch sử, Văn hoá', icon: '/iconcategory-list/lichsu-icon.png', color: 'bg-red-500' },
+    { id: '6', name: 'Quản lý công ty', icon: '/iconcategory-list/quanly-icon.png', color: 'bg-green-500' },
+  ];
 
   const handleSearch = (keyword: string) => {
     router.push(`/search-detail?keyword=${encodeURIComponent(keyword)}`);
@@ -85,42 +101,18 @@ export default function SearchPage() {
         </div>
 
         <div className="grid grid-cols-2 gap-[10px]">
-          <button className="w-[165.5px] h-[40px] bg-[#1F222A] rounded-[4px] hover:opacity-80">
-            <div className="flex gap-2 items-center h-full px-[10px] py-[8px]">
-              <div className="w-[3px] h-6 bg-purple-500 rounded"></div>
-              <span className="text-white truncate">Tâm linh</span>
-            </div>
-          </button>
-          <button className="w-[165.5px] h-[40px] bg-[#1F222A] rounded-[4px] hover:opacity-80">
-            <div className="flex gap-2 items-center h-full px-[10px] py-[8px]">
-              <div className="w-[3px] h-6 bg-orange-500 rounded"></div>
-              <span className="text-white truncate">Hồi ký và tiểu sử</span>
-            </div>
-          </button>
-          <button className="w-[165.5px] h-[40px] bg-[#1F222A] rounded-[4px] hover:opacity-80">
-            <div className="flex gap-2 items-center h-full px-[10px] py-[8px]">
-              <div className="w-[3px] h-6 bg-yellow-500 rounded"></div>
-              <span className="text-white truncate">Kinh tế</span>
-            </div>
-          </button>
-          <button className="w-[165.5px] h-[40px] bg-[#1F222A] rounded-[4px] hover:opacity-80">
-            <div className="flex gap-2 items-center h-full px-[10px] py-[8px]">
-              <div className="w-[3px] h-6 bg-blue-500 rounded"></div>
-              <span className="text-white truncate">Tài chính, đầu tư</span>
-            </div>
-          </button>
-          <button className="w-[165.5px] h-[40px] bg-[#1F222A] rounded-[4px] hover:opacity-80">
-            <div className="flex gap-2 items-center h-full px-[10px] py-[8px]">
-              <div className="w-[3px] h-6 bg-red-500 rounded"></div>
-              <span className="text-white truncate">Lịch sử, Văn hoá</span>
-            </div>
-          </button>
-          <button className="w-[165.5px] h-[40px] bg-[#1F222A] rounded-[4px] hover:opacity-80">
-            <div className="flex gap-2 items-center h-full px-[10px] py-[8px]">
-              <div className="w-[3px] h-6 bg-green-500 rounded"></div>
-              <span className="text-white truncate">Quản lý công ty</span>
-            </div>
-          </button>
+          {categories.map((category) => (
+            <button
+              key={category.id}
+              onClick={() => router.push(`/category-list?categoryId=${category.id}&name=${encodeURIComponent(category.name)}`)}
+              className="w-[165.5px] h-[40px] bg-[#1F222A] rounded-[4px] hover:opacity-80"
+            >
+              <div className="flex gap-2 items-center h-full px-[10px] py-[8px]">
+                <div className={`w-[3px] h-6 ${category.color} rounded`}></div>
+                <span className="text-white truncate">{category.name}</span>
+              </div>
+            </button>
+          ))}
         </div>
       </div>
     </div>

@@ -27,9 +27,12 @@ interface TrendingAudiobook {
 }
 
 interface Author {
-  name: string;
-  image?: string;
-  audiobooks: number;
+    id: number;
+    name: string;
+    image: string;
+    publisherName: string;
+    totalListen: number;
+    scoreContent: number;
 }
 
 export default function Audio() {
@@ -62,18 +65,16 @@ export default function Audio() {
           setTrendingAuthors([]);
         } else if (data.data.trendingAudiobook && data.data.trendingAudiobook.length > 0) {
           setSearchResults([]);
-          // Group by publisher and count their audiobooks
-          const authorsMap = data.data.trendingAudiobook.reduce((acc: { [key: string]: Author }, book: TrendingAudiobook) => {
-            if (!acc[book.publisherName]) {
-              acc[book.publisherName] = {
-                name: book.publisherName,
-                audiobooks: 0
-              };
-            }
-            acc[book.publisherName].audiobooks++;
-            return acc;
-          }, {});
-          setTrendingAuthors(Object.values(authorsMap));
+          // Map trending audiobooks directly
+          const trendingBooks = data.data.trendingAudiobook.map((book: TrendingAudiobook) => ({
+            id: book.id,
+            name: book.name,
+            image: book.image,
+            publisherName: book.publisherName,
+            totalListen: book.totalListen,
+            scoreContent: book.scoreContent
+          }));
+          setTrendingAuthors(trendingBooks);
         }
       }
     } catch (error) {
@@ -142,16 +143,40 @@ export default function Audio() {
         <div className="mb-6">
           <h2 className="mb-4 text-lg font-semibold text-white">Audio trending</h2>
           <div className="space-y-3">
-            {trendingAuthors.map((author, index) => (
-              <div key={index} className="bg-[#1F222A] p-3 rounded-lg flex items-center gap-3">
-                <img 
-                  src={author.image || '/default-author.png'} 
-                  alt={author.name}
-                  className="w-12 h-12 rounded-full"
-                />
-                <div>
-                  <h3 className="font-medium text-white">{author.name}</h3>
-                  <p className="text-sm text-gray-400">{author.audiobooks} audiobook</p>
+            {trendingAuthors.map((book, index) => (
+              <div 
+                key={index} 
+                className="bg-[#1F222A] p-3 rounded-lg flex items-center gap-3 cursor-pointer hover:bg-[#252832]"
+                onClick={() => handleBookClick(book.id)}
+              >
+                <div className="relative">
+                  {index < 3 && (
+                    <img 
+                      src={`/app.body/rank${index + 1}.png`}
+                      alt={`Rank ${index + 1}`}
+                      className="absolute -top-3 -left-3 z-10 w-8 h-8"
+                    />
+                  )}
+                  <img 
+                    src={book.image || '/default-author.png'} 
+                    alt={book.name}
+                    className="w-[94px] h-[94px] rounded-[6px] object-cover"
+                  />
+                </div>
+                <div className="flex-1">
+                  <h3 className="mb-1 font-medium text-white">{book.name}</h3>
+                  <div className="flex gap-2 items-center mb-1">
+                    <img 
+                      src="/app.body/tacgia.png" 
+                      alt="Author"
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm text-gray-400">{book.publisherName}</span>
+                  </div>
+                  <div className="flex gap-2 items-center">
+                    <span className="text-sm text-yellow-400">⭐ {book.scoreContent.toFixed(1)}</span>
+                    <span className="text-sm text-gray-400">({book.totalListen} lượt nghe)</span>
+                  </div>
                 </div>
               </div>
             ))}

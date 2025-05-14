@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setKeyword } from '../Redux/Features/searchSlice';
 import { RootState } from  '../Redux/Store';
 import Audio from '../../components/search/audio';
-
+import TacGia from '../../components/search/tacgia';
 interface SearchResult {
   id: string;
   contentId: number;
@@ -144,7 +144,7 @@ export default function SearchDetailPage() {
 
       <div className="py-4 space-y-4">
           {activeTab === 'audio' && <div><Audio /></div>}
-          {activeTab === 'author' && <div><Audio /></div>}
+          {activeTab === 'author' && <div><TacGia /></div>}
           {activeTab === 'podcast' && <div><Audio /></div>}
         </div>
 

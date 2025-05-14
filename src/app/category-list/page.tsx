@@ -75,14 +75,14 @@ export default function CategoryListPage() {
         const data = await response.json();
         if (data.code === 200) {
           const items = data.data.cateItem;
-          // Lưu danh sách gốc
+
           setOriginalItems(items);
           
-          // Xử lý sắp xếp dựa trên sortBy
+
           let sortedItems = [...items];
           
           if (sortBy === 'newest') {
-            // Sắp xếp giảm dần theo publisherDate (ngày mới lên trước)
+ 
             sortedItems = sortedItems.sort((a, b) => {
               const [da, ma, ya] = a.publisherDate.split('/').map(Number);
               const [db, mb, yb] = b.publisherDate.split('/').map(Number);
@@ -92,7 +92,7 @@ export default function CategoryListPage() {
             });
             console.log('Danh sách sau khi sắp xếp mới nhất:', sortedItems);
           } else if (sortBy === 'oldest') {
-            // Sắp xếp tăng dần theo publisherDate (ngày cũ lên trước)
+
             sortedItems = sortedItems.sort((a, b) => {
               const [da, ma, ya] = a.publisherDate.split('/').map(Number);
               const [db, mb, yb] = b.publisherDate.split('/').map(Number);
@@ -144,36 +144,37 @@ export default function CategoryListPage() {
   };
 
   return (
-    <main className="w-screen min-h-screen bg-[#1a1a1a] text-white">
-      <div className="flex items-center justify-between p-4 bg-[#0f0f0f]">
-        <button onClick={handleBack} className="text-white">
+    <main className="w-full min-h-screen bg-[#1a1a1a] text-white overflow-x-hidden">
+      <div className="flex items-center justify-between p-4 bg-[#0f0f0f] sticky top-0 z-20">
+        <button onClick={handleBack} className="text-white transition-opacity hover:opacity-80">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
         <div className="hidden md:block">
-          <h1 className="text-base font-medium">Sách nói chất lượng</h1>
+          <h1 className="text-lg font-medium md:text-xl">{categoryName}</h1>
         </div>
         <div className="block md:hidden">
-          <span className="text-base font-medium">Sách nói chất lượng</span>
+          <span className="text-base font-medium">{categoryName}</span>
         </div>
-        <button className="ml-auto text-white rounded-md" onClick={toggleSortDialog}>
+        <button className="ml-auto text-white rounded-md transition-opacity hover:opacity-80" onClick={toggleSortDialog}>
           <Image 
             src="/app.body/iconcategory-list.png"
             alt="Category list icon"
             width={32}
             height={32}
+            className="w-6 h-6 md:w-8 md:h-8"
           />
         </button>
       </div>
 
       {/* Sort Dialog */}
       {showSortDialog && (
-        <div className="absolute right-4 top-16 z-10 bg-[#333333] rounded-lg shadow-lg w-48">
+        <div className="fixed right-4 top-16 z-30 bg-[#333333] rounded-lg shadow-lg w-48 md:w-56">
           {sortOptions.map((option) => (
             <button
               key={option.id}
-              className="block w-full text-left px-4 py-3 text-sm hover:bg-[#444444]"
+              className="block w-full text-left px-4 py-3 text-sm md:text-base hover:bg-[#444444] transition-colors"
               onClick={() => handleSortOptionClick(option.id)}
             >
               {option.name}
@@ -183,14 +184,14 @@ export default function CategoryListPage() {
       )}
 
       {/* Tabs */}
-      <div className="flex overflow-x-auto p-2 space-x-2 bg-[#1a1a1a]">
+      <div className="flex overflow-x-auto p-2 space-x-2 bg-[#1a1a1a] scrollbar-hide sticky top-16 z-10">
         {categories.map((category) => (
           <button 
             key={category.id}
-            className={`px-6 py-2 text-sm rounded-full whitespace-nowrap transition-all duration-150
+            className={`px-4 md:px-6 py-2 text-sm md:text-base rounded-full whitespace-nowrap transition-all duration-150
               ${activeTab === category.id 
                 ? 'bg-white text-black font-semibold shadow-md' 
-                : 'bg-[#222] text-white'
+                : 'bg-[#222] text-white hover:bg-[#333]'
               }`}
             onClick={() => handleTabChange(category.id)}
           >
@@ -199,41 +200,39 @@ export default function CategoryListPage() {
         ))}
       </div>
 
-
-
       {/* Book Grid */}
-      <div className="grid grid-cols-2 gap-4 p-4 md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 p-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 md:gap-6 md:p-6">
         {categoryItems.map((item) => (
           <div 
             key={item.id} 
-            className="relative cursor-pointer"
+            className="relative transition-transform duration-200 transform cursor-pointer hover:scale-105"
             onClick={() => handleBookClick(item)}
           >
-            <div className="relative aspect-[3/4] rounded-lg overflow-hidden">
+            <div className="relative aspect-[3/4] rounded-lg overflow-hidden shadow-lg">
               <Image
                 src={"/app.body/echoes.png"}
                 alt={item.name}
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 160px, 20vw"
+                sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 20vw"
               />
               {item.isHot === 1 && (
-                <div className="absolute top-2 right-2 px-2 py-1 text-xs text-white bg-yellow-500 rounded-full">
+                <div className="absolute top-2 right-2 px-2 py-1 text-xs text-white bg-yellow-500 rounded-full md:text-sm">
                   HOT
                 </div>
               )}
               {item.typeEarn === 1 && (
-                <div className="absolute bottom-2 left-2 px-2 py-1 text-xs text-white bg-green-500 rounded-full">
+                <div className="absolute bottom-2 left-2 px-2 py-1 text-xs text-white bg-green-500 rounded-full md:text-sm">
                   VIP
                 </div>
               )}
             </div>
-            <h3 className="mt-2 text-sm text-white truncate line-clamp-1">{item.name}</h3>
-            <div className="mt-1 text-xs text-gray-400">
+            <h3 className="mt-2 text-sm font-medium text-white truncate md:text-base line-clamp-1">{item.name}</h3>
+            <div className="mt-1 text-xs text-gray-400 md:text-sm">
               {item.duration} phút • {item.totalListen} lượt nghe
             </div>
             {item.scoreContent > 0 && (
-              <div className="flex items-center mt-1 text-xs text-yellow-500">
+              <div className="flex items-center mt-1 text-xs text-yellow-500 md:text-sm">
                 {'★'.repeat(Math.floor(item.scoreContent))}
                 {item.scoreContent % 1 !== 0 && '★'.slice(0, 1)}
                 {'☆'.repeat(5 - Math.ceil(item.scoreContent))}
