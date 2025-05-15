@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import type { RootState } from '../../app/Redux/Store';
+import type { RootState } from '../../../Redux/Store';
 
 interface BookDetail {
   id: number;

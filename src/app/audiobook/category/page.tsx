@@ -26,7 +26,7 @@ export default function CategoryPage() {
 
   const handleCategoryClick = (categoryId: number) => {
     // Truyền categoryId qua URL
-    router.push(`/category-list?categoryId=${categoryId}&name=${encodeURIComponent(categories.find(c => c.id === categoryId)?.name || '')}`);
+    router.push(`/audiobook/category-list?categoryId=${categoryId}&name=${encodeURIComponent(categories.find(c => c.id === categoryId)?.name || '')}`);
   };
 
   return (

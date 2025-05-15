@@ -12,9 +12,9 @@ function Appfooter() {
         if (buttonName === 'Audiobook') {
             router.push('/'); // Điều hướng đến trang chủ
         } else if (buttonName === 'Podcast') {
-            router.push('/podcast'); // Điều hướng đến trang podcast
+            router.push('/pod_cast/podcast'); // Điều hướng đến trang podcast
         }else if (buttonName === 'Cá nhân') {
-            router.push('/canhan'); // Điều hướng đến trang podcast
+            router.push('/ca_nhan/canhan'); // Điều hướng đến trang podcast
         }
     };
 

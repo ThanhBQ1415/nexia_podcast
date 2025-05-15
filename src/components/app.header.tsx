@@ -27,7 +27,7 @@ const AppHeader: React.FC = () => {
             type="text"
             placeholder="Tìm kiếm..."
             className="w-full bg-[#1e1e1e] text-gray-200 px-8 py-2.5 pl-10 text-sm focus:outline-none focus:ring-1 focus:ring-gray-600 placeholder:text-gray-500 cursor-pointer"
-            onClick={() => router.push('/search')}
+            onClick={() => router.push('search_book/search')}
             readOnly
           />
           <div className="absolute left-3 top-1/2 transform -translate-y-1/2">

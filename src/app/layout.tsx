@@ -4,7 +4,7 @@ import Appheader from '@/components/app.header';
 import Appfooter from '@/components/app.footer';
 import { Bounce, ToastContainer } from 'react-toastify';
 import { Provider } from 'react-redux';
-import { store } from '@/app/Redux/Store';
+import { store } from '@/Redux/Store';
 import '@/styles/globals.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 

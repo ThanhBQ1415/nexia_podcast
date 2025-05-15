@@ -27,7 +27,7 @@ export default function ProfilePage() {
       <div 
         className="w-full max-w-full h-44 md:h-52 lg:h-60 mx-auto rounded-b-2xl relative text-[#FAFAFA] bg-no-repeat"
         style={{ 
-          backgroundImage: 'url("app.body/canhanbackground.png")',
+          backgroundImage: 'url("/app.body/canhanbackground.png")',
           backgroundSize: '100% 100%',
           backgroundPosition: 'center'
         }}
@@ -53,10 +53,10 @@ export default function ProfilePage() {
             <div className="flex items-center space-x-1">
               <h2 className="font-medium text-sm md:text-base lg:text-lg text-[#FAFAFA]">Chanon2k</h2>
               <img 
-                src="app.body/edituser.png" 
+                  src="/app.body/edituser.png" 
                 alt="Edit" 
                 className="w-5 h-5 cursor-pointer md:w-6 md:h-6" 
-                onClick={() => router.push('/editcanhan')}
+                onClick={() => router.push('/ca_nhan/editcanhan')}
               />
             </div>
             <p className="text-xs md:text-sm text-[#FAFAFA] opacity-80">ID: 1908BHT</p>
@@ -70,7 +70,7 @@ export default function ProfilePage() {
               boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)'
             }}
           >
-            <img src="app.body/xu.png" alt="Xu" className="w-4 h-4 md:w-5 md:h-5" />
+            <img src="/app.body/xu.png" alt="Xu" className="w-4 h-4 md:w-5 md:h-5" />
             Nạp xu
           </button>
         </div>
@@ -81,7 +81,7 @@ export default function ProfilePage() {
         {/* VIP account section */}
         <div className="flex items-center p-3 bg-[#1F222A] rounded-lg w-full h-[67px]">
           <div className="flex items-center w-full">
-            <img src="app.body/mienphi.png" alt="VIP" className="mr-2 w-8 h-8" />
+            <img src="/app.body/mienphi.png" alt="VIP" className="mr-2 w-8 h-8" />
             <div className="flex flex-col">
               <span className="text-sm font-medium">Tài khoản vip</span>
               <span className="text-xs text-gray-400">Gói miễn phí</span>
@@ -92,7 +92,7 @@ export default function ProfilePage() {
         {/* Current balance */}
         <div className="flex items-center p-3 bg-[#1F222A] rounded-lg w-full h-[67px]">
           <div className="flex items-center w-full">
-            <img src="app.body/xu.png" alt="Xu" className="mr-2 w-8 h-8" />
+            <img src="/app.body/xu.png" alt="Xu" className="mr-2 w-8 h-8" />
             <div className="flex flex-col">
               <span className="text-sm font-medium">Bạn đang có</span>
               <span className="text-xs text-gray-400">0 xu</span>

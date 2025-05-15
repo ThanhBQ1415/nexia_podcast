@@ -24,7 +24,7 @@ export default function SearchPage() {
   ];
 
   const handleSearch = (keyword: string) => {
-    router.push(`/search-detail?keyword=${encodeURIComponent(keyword)}`);
+    router.push(`/search_book/search-detail?keyword=${encodeURIComponent(keyword)}`);
   };
 
   return (
@@ -61,11 +61,11 @@ export default function SearchPage() {
           Lịch sử tìm kiếm
         </h2>
         <div className="flex flex-wrap gap-2">
-          <button onClick={() => router.push(`/search-detail?keyword=Yêu thích`)} className="px-2.5 py-1 bg-[#1F222A] text-[#9E9E9E] rounded-full text-ks hover:opacity-80">Yêu thích</button>
-          <button onClick={() => router.push(`/search-detail?keyword=Podcast`)} className="px-2.5 py-1 bg-[#1F222A] text-[#9E9E9E] rounded-full text-ks hover:opacity-80">Podcast</button>
-          <button onClick={() => router.push(`/search-detail?keyword=Hay nhất`)} className="px-2.5 py-1 bg-[#1F222A] text-[#9E9E9E] rounded-full text-ks hover:opacity-80">Hay nhất</button>
-          <button onClick={() => router.push(`/search-detail?keyword=Audio`)} className="px-2.5 py-1 bg-[#1F222A] text-[#9E9E9E] rounded-full text-ks hover:opacity-80">Audio</button>
-          <button onClick={() => router.push(`/search-detail?keyword=Sách mới nhất`)} className="px-2.5 py-1 bg-[#1F222A] text-[#9E9E9E] rounded-full text-ks hover:opacity-80">Sách mới nhất</button>
+          <button onClick={() => router.push(`/search_book/search-detail?keyword=Yêu thích`)} className="px-2.5 py-1 bg-[#1F222A] text-[#9E9E9E] rounded-full text-ks hover:opacity-80">Yêu thích</button>
+          <button onClick={() => router.push(`/search_book/search-detail?keyword=Podcast`)} className="px-2.5 py-1 bg-[#1F222A] text-[#9E9E9E] rounded-full text-ks hover:opacity-80">Podcast</button>
+          <button onClick={() => router.push(`/search_book/search-detail?keyword=Hay nhất`)} className="px-2.5 py-1 bg-[#1F222A] text-[#9E9E9E] rounded-full text-ks hover:opacity-80">Hay nhất</button>
+          <button onClick={() => router.push(`/search_book/search-detail?keyword=Audio`)} className="px-2.5 py-1 bg-[#1F222A] text-[#9E9E9E] rounded-full text-ks hover:opacity-80">Audio</button>
+          <button onClick={() => router.push(`/search_book/search-detail?keyword=Sách mới nhất`)} className="px-2.5 py-1 bg-[#1F222A] text-[#9E9E9E] rounded-full text-ks hover:opacity-80">Sách mới nhất</button>
         </div>
       </div>
 
@@ -75,11 +75,11 @@ export default function SearchPage() {
           Từ khoá phổ biến
         </h2>
         <div className="flex flex-wrap gap-2">
-          <button onClick={() => router.push(`/search-detail?keyword=Nguyễn Nhật Ánh`)} className="px-2.5 py-1 bg-[#1F222A] text-[#9E9E9E] rounded-full text-ks hover:opacity-80">Nguyễn Nhật Ánh</button>
-          <button onClick={() => router.push(`/search-detail?keyword=Triết học`)} className="px-2.5 py-1 bg-[#1F222A] text-[#9E9E9E] rounded-full text-ks hover:opacity-80">Triết học</button>
-          <button onClick={() => router.push(`/search-detail?keyword=Thay đổi tư duy`)} className="px-2.5 py-1 bg-[#1F222A] text-[#9E9E9E] rounded-full text-ks hover:opacity-80">Thay đổi tư duy</button>
-          <button onClick={() => router.push(`/search-detail?keyword=Cách sống`)} className="px-2.5 py-1 bg-[#1F222A] text-[#9E9E9E] rounded-full text-ks hover:opacity-80">Cách sống</button>
-          <button onClick={() => router.push(`/search-detail?keyword=Marketing toàn cầu`)} className="px-2.5 py-1 bg-[#1F222A] text-[#9E9E9E] rounded-full text-ks hover:opacity-80">Marketing toàn cầu</button>
+          <button onClick={() => router.push(`/search_book/search-detail?keyword=Nguyễn Nhật Ánh`)} className="px-2.5 py-1 bg-[#1F222A] text-[#9E9E9E] rounded-full text-ks hover:opacity-80">Nguyễn Nhật Ánh</button>
+          <button onClick={() => router.push(`/search_book/search-detail?keyword=Triết học`)} className="px-2.5 py-1 bg-[#1F222A] text-[#9E9E9E] rounded-full text-ks hover:opacity-80">Triết học</button>
+          <button onClick={() => router.push(`/search_book/search-detail?keyword=Thay đổi tư duy`)} className="px-2.5 py-1 bg-[#1F222A] text-[#9E9E9E] rounded-full text-ks hover:opacity-80">Thay đổi tư duy</button>
+          <button onClick={() => router.push(`/search_book/search-detail?keyword=Cách sống`)} className="px-2.5 py-1 bg-[#1F222A] text-[#9E9E9E] rounded-full text-ks hover:opacity-80">Cách sống</button>
+          <button onClick={() => router.push(`/search_book/search-detail?keyword=Marketing toàn cầu`)} className="px-2.5 py-1 bg-[#1F222A] text-[#9E9E9E] rounded-full text-ks hover:opacity-80">Marketing toàn cầu</button>
         </div>
       </div>
 
@@ -104,7 +104,7 @@ export default function SearchPage() {
           {categories.map((category) => (
             <button
               key={category.id}
-              onClick={() => router.push(`/category-list?categoryId=${category.id}&name=${encodeURIComponent(category.name)}`)}
+              onClick={() => router.push(`/audiobook/category-list?categoryId=${category.id}&name=${encodeURIComponent(category.name)}`)}
               className="w-[165.5px] h-[40px] bg-[#1F222A] rounded-[4px] hover:opacity-80"
             >
               <div className="flex gap-2 items-center h-full px-[10px] py-[8px]">

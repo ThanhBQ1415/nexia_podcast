@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import type { RootState } from '../../app/Redux/Store';
+import type { RootState } from '../../../Redux/Store';
 import { useRouter } from 'next/navigation';
 
 
@@ -132,7 +132,7 @@ export default function Audio() {
       <div className="p-4">
         <div className="flex flex-col items-center mb-8">
           <img 
-            src="app.body/404.png" 
+            src="/app.body/404.png" 
             alt="Not Found"
             className="mb-4 w-32 h-32"
           />

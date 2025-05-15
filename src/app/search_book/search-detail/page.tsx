@@ -3,10 +3,10 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setKeyword } from '../Redux/Features/searchSlice';
-import { RootState } from  '../Redux/Store';
-import Audio from '../../components/search/audio';
-import TacGia from '../../components/search/tacgia';
+import { setKeyword } from '../../../Redux/Features/searchSlice';
+import { RootState } from  '../../../Redux/Store';
+import Audio from '../components/audio';
+import TacGia from '../components/tacgia';
 interface SearchResult {
   id: string;
   contentId: number;

@@ -12,15 +12,15 @@ export default function EditProfile() {
     <div className="flex flex-col min-h-screen bg-[#212121] text-white mx-auto md:max-w-2xl lg:max-w-4xl overflow-x-hidden">
       {/* Header */}
       <div 
-        className="p-4 rounded-b-[32px] relative w-[375px] h-[181px] bg-no-repeat"
+        className="p-4 rounded-b-[32px] relative w-full h-[181px] bg-no-repeat"
         style={{ 
-          backgroundImage: 'url("app.body/canhanbackground.png")',
-          backgroundSize: '100% 100%',
+          backgroundImage: 'url("/app.body/canhanbackground.png")',
+          backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}
       >
         <div className="flex items-center h-[64px]">
-          <button className="text-white" onClick={() => router.push('/canhan')}>
+          <button className="text-white" onClick={() => router.push('/ca_nhan/canhan')}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M15 19.5L7.5 12L15 4.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
@@ -78,7 +78,7 @@ export default function EditProfile() {
             <div className="flex items-center space-x-1">
               <h2 className="font-medium text-sm md:text-base lg:text-lg text-[#FAFAFA]">Chanon2k</h2>
               <img 
-                src="app.body/edituser.png" 
+                src="/app.body/edituser.png" 
                 alt="Edit" 
                 className="w-5 h-5 cursor-pointer md:w-6 md:h-6" 
      

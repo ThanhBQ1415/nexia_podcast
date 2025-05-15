@@ -88,7 +88,7 @@ export default function Home() {
   }, []);
 
   const handleBookClick = (book: CateItem) => {
-    router.push(`audiobookdetail?id=${book.id}`);
+    router.push(`/audiobook/audiobookdetail?id=${book.id}`);
   };
 
   return (
@@ -125,7 +125,7 @@ export default function Home() {
           <h2 className="text-base font-semibold text-white">Thể loại</h2>
           <button 
             className="text-xl text-white"
-            onClick={() => router.push('/category')}
+            onClick={() => router.push('/audiobook/category')}
           >
             {'>'}
           </button>
@@ -136,19 +136,19 @@ export default function Home() {
           <div className="flex flex-wrap gap-2 md:flex-nowrap md:flex-1">
             <button 
               className="flex-1 flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-md border-l-4 border-green-500 md:flex-1"
-              onClick={() => router.push('/category-list?name=Tâm linh')}
+              onClick={() => router.push('/audiobook/category-list?name=Tâm linh')}
             >
               Tâm linh
             </button>
             <button 
               className="flex-1 flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-md border-l-4 border-orange-500 md:flex-1"
-              onClick={() => router.push('/category-list?name=Hồi ký và tiểu sử')}
+              onClick={() => router.push('/audiobook/category-list?name=Hồi ký và tiểu sử')}
             >
               Hồi ký và tiểu sử
             </button>
             <button 
               className="flex-1 flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-md border-l-4 border-purple-500 md:flex-1"
-              onClick={() => router.push('/category-list?name=Lịch sử, Văn hoá')}
+              onClick={() => router.push('/audiobook/category-list?name=Lịch sử, Văn hoá')}
             >
               Lịch sử, Văn hoá
             </button>
@@ -157,19 +157,19 @@ export default function Home() {
           <div className="flex flex-wrap gap-2 mt-2 md:mt-0 md:flex-nowrap md:flex-1">
             <button 
               className="flex-1 flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-md border-l-4 border-yellow-500 md:flex-1"
-              onClick={() => router.push('/category-list?name=Kinh tế')}
+              onClick={() => router.push('/audiobook/category-list?name=Kinh tế')}
             >
               Kinh tế
             </button>
             <button 
               className="flex-1 flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-md border-l-4 border-blue-500 md:flex-1"
-              onClick={() => router.push('/category-list?name=Tài chính, đầu tư')}
+              onClick={() => router.push('/audiobook/category-list?name=Tài chính, đầu tư')}
             >
               Tài chính, đầu tư
             </button>
             <button 
               className="flex-1 flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-md border-l-4 border-gray-500 md:flex-1"
-              onClick={() => router.push('/category-list?name=Quản lý công ty')}
+              onClick={() => router.push('/audiobook/category-list?name=Quản lý công ty')}
             >
               Quản lý công ty
             </button>
@@ -315,7 +315,6 @@ export default function Home() {
       <div className="bg-[#0f0f0f] p-4 rounded-lg w-full ">
         <button 
           className="w-full bg-[#FFA500] text-white py-3 rounded-lg font-medium text-center"
-          onClick={() => router.push('/vip-subscription')}
         >
           Nghe VIP chỉ từ 8.999 đ
         </button>

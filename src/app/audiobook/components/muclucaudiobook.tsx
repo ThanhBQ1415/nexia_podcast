@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
-import type { RootState } from '../../app/Redux/Store';
-import { setChapterId } from '../../app/Redux/Features/audiobookSlice';
+import type { RootState } from '../../../Redux/Store';
+import { setChapterId } from '../../../Redux/Features/audiobookSlice';
 
 interface Chapter {
   id: number;
@@ -70,7 +70,7 @@ const MucLuc = () => {
 
   const handleChapterClick = (chapterId: number) => {
     dispatch(setChapterId(chapterId));
-    router.push('/phat-audiobook');
+    router.push('/audiobook/phat-audiobook');
   };
 
   return (

@@ -1,6 +1,6 @@
 'use client'
 import { useSelector } from 'react-redux';
-import { RootState } from '../Redux/Store';
+import { RootState } from '../../Redux/Store';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -198,7 +198,7 @@ export default function PhatAudiobook() {
       <div className="relative z-10">
         {/* Header */}
         <div className="flex justify-between items-center p-4">
-          <button onClick={() => router.push(`/audiobookdetail?id=${bookId}`)} className="text-white">
+          <button onClick={() => router.push(`/audiobook/audiobookdetail?id=${bookId}`)} className="text-white">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M15 18l-6-6 6-6" />
             </svg>

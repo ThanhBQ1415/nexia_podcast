@@ -33,11 +33,11 @@ interface CateItem {
 }
 
 
-import GioiThieu from '../../components/audiobook/gioithieuaudiobook';
-import MucLuc from '../../components/audiobook/muclucaudiobook';
-import TuongTu from '../../components/audiobook/tuongtuaudiobook';
+import GioiThieu from '../components/gioithieuaudiobook';
+import MucLuc from '../components/muclucaudiobook';
+import TuongTu from '../components/tuongtuaudiobook';
 
-import { setBookId } from '../Redux/Features/audiobookSlice';
+import { setBookId } from '../../../Redux/Features/audiobookSlice';
 
 export default function AudiobookDetail() {
   const searchParams = useSearchParams();
@@ -184,7 +184,7 @@ export default function AudiobookDetail() {
       <div className="p-2">
         <div className="flex gap-4 px-4 mb-2">
           <button 
-            onClick={() => router.push('/phat-audiobook')}
+            onClick={() => router.push('/audiobook/phat-audiobook')}
             className="flex flex-1 gap-2 justify-center items-center py-3.5 font-medium text-green-500 bg-[#1F222A] rounded-full hover:bg-[#2a2d36] transition-colors"
           >
             <Image 

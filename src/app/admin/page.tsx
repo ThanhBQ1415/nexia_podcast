@@ -1,5 +1,0 @@
-const Hehe = () => {
-    return (
-        <>ehehehehheS</>
-    )
-}

@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import type { RootState } from '@/app/Redux/Store';
+import type { RootState } from '../../../Redux/Store';
 
 interface SearchResult {
   id: string;
@@ -78,7 +78,7 @@ const TacGia = () => {
     return (
       <div className="space-y-6">
         <div className="flex flex-col justify-center items-center py-8 space-y-1">
-          <img src="/app.body/404.png" alt="404" className="mb-4 w-24 h-24" />
+          <img src="/app.body/404.png" alt="404"  className="mb-4 w-32 h-32" />
           <p className="text-gray-400">Không tìm thấy mất rồi!</p>
           <p className="text-gray-400">Hãy thử với từ khoá khác</p>
         </div>
