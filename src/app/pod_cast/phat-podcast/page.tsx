@@ -65,6 +65,23 @@ export default function PhatAudiobook() {
   const [showtimemodal, setShowTimerModal] = useState(false);
   const router = useRouter();
   const [selectedTimer, setSelectedTimer] = useState<string | number>('Không hẹn giờ');
+  const audioRef = useRef<HTMLAudioElement>(null); // Ensure audioRef is defined
+
+
+
+  useEffect(() => {
+    if (currentChapter) {
+      setCurrentTime(0);
+      setIsPlaying(false); // Tạm dừng khi tải chapter mới
+      if (audioRef.current) {
+        audioRef.current.src = currentChapter.file;
+        audioRef.current.load(); // Tải file nhạc mới
+      }
+    }
+  }, [currentChapter]);
+
+
+
   useEffect(() => {
     const fetchAudiobookDetail = async () => {
       if (!bookId) {
@@ -74,7 +91,7 @@ export default function PhatAudiobook() {
       }
 
       try {
-        const response = await fetch(`http://192.168.1.88:8386/nexia-service/v1/common/detail?type=1&id=${bookId}`, {
+        const response = await fetch(`http://192.168.1.88:8386/nexia-service/v1/common/detail?type=0&id=${bookId}`, {
           headers: {
             'userId': '1'
           }
@@ -96,18 +113,12 @@ export default function PhatAudiobook() {
     fetchAudiobookDetail();
   }, [bookId]);
 
-
-
-
-
-  // Remove or comment out the audio element and its related code
-  const audioRef = useRef<HTMLAudioElement>(null);
   useEffect(() => {
     const fetchChapters = async () => {
       if (!bookId) return;
       
       try {
-        const response = await fetch(`http://192.168.1.88:8386/nexia-service/v1/common/toc?page=0&size=10&type=1&id=${bookId}`, {
+        const response = await fetch(`http://192.168.1.88:8386/nexia-service/v1/common/toc?page=0&size=10&type=0&id=${bookId}`, {
           headers: {
             'userId': '1'
           }
@@ -121,7 +132,16 @@ export default function PhatAudiobook() {
             ? data.data.find((chapter: Chapter) => chapter.id === chapterId)
             : data.data[0];
           
-          setCurrentChapter(selectedChapter);
+          if (selectedChapter) {
+            setCurrentChapter(selectedChapter);
+            // Set audio source and load when currentChapter changes
+            if (audioRef.current) {
+              audioRef.current.src = selectedChapter.file;
+              audioRef.current.load();
+              setIsPlaying(false); // Pause when loading new chapter
+              setCurrentTime(0); // Reset time
+            }
+          }
         } else {
           setError(data.message || 'Có lỗi xảy ra khi tải danh sách chapter');
         }
@@ -133,55 +153,64 @@ export default function PhatAudiobook() {
     fetchChapters();
   }, [bookId, chapterId]);
 
-  // Update title and duration when current chapter changes
-  useEffect(() => {
-    if (currentChapter) {
-      setCurrentTime(0);
-      setIsPlaying(false);
-      if (audioRef.current) {
-        audioRef.current.src = currentChapter.file;
-        audioRef.current.load();
-      }
-    }
-  }, [currentChapter]);
-
+  // Handle time update from audio element
   const handleTimeUpdate = () => {
     if (audioRef.current) {
       setCurrentTime(audioRef.current.currentTime);
     }
   };
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isPlaying) {
-      interval = setInterval(() => {
-        setCurrentTime((prevTime) => {
-          if (currentChapter && prevTime < currentChapter.duration) {
-            return prevTime + 1;
-          } else {
-            clearInterval(interval);
-            setIsPlaying(false);
-            return prevTime;
-          }
-        });
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isPlaying, currentChapter]);
-  
+  // Handle play/pause
   const handlePlayPause = () => {
-    setIsPlaying(!isPlaying);
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
   };
-  
-  // In the JSX, remove the audio element
+
+  // Format time helper function (seconds to MM:SS)
+  const formatTime = (timeInSeconds: number) => {
+    if (isNaN(timeInSeconds) || timeInSeconds < 0) return "0:00";
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+
+  if (loading) {
+    return <div className="flex justify-center items-center min-h-screen text-center text-gray-400 bg-black">Đang tải...</div>;
+  }
+
+  if (error) {
+    return <div className="flex justify-center items-center min-h-screen text-center text-red-500 bg-black">{error}</div>;
+  }
+
+  // Thêm audio element vào component
   return (
     <div className="relative min-h-screen bg-[#181A20] text-white pb-16">
-      {/* Remove this:
       <audio
         ref={audioRef}
         onTimeUpdate={handleTimeUpdate}
         onEnded={() => setIsPlaying(false)}
-      /> */}
+        onLoadedMetadata={() => {
+          // Reset time and update duration when metadata is loaded
+          if (audioRef.current) {
+            setCurrentTime(0);
+            // You might want to store duration in state if needed elsewhere,
+            // but for progress bar and display, using audioRef.current.duration is fine.
+          }
+        }}
+        // Add onError handler for debugging
+        onError={(e) => {
+          console.error("Audio error:", e);
+          setError("Không thể phát file âm thanh.");
+          setIsPlaying(false);
+        }}
+      />
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -213,7 +242,8 @@ export default function PhatAudiobook() {
         </div>
 
         {/* Main Content */}
-        <div className="flex flex-col items-center px-4 pt-8">
+        {/* Added pb-24 here */}
+        <div className="flex flex-col items-center px-4 pt-8 pb-24">
           {/* Album Art */}
           <div className="overflow-hidden relative mb-6 w-40 h-40 rounded-lg">
             <Image
@@ -248,13 +278,13 @@ export default function PhatAudiobook() {
               <div 
                 className="h-full bg-green-500 rounded-full" 
                 style={{ 
-                  width: `${(currentTime / (currentChapter?.duration || 1)) * 100}%` 
+                  width: `${(currentTime / (audioRef.current?.duration || 1)) * 100}%` 
                 }}
               ></div>
             </div>
             <div className="flex justify-between mt-2 text-sm text-[#E0E0E0]">
-              <span>{new Date(currentTime * 1000).toISOString().substr(14, 5)}</span>
-              <span>{new Date((currentChapter?.duration || 0) * 1000).toISOString().substr(14, 5)}</span>
+              <span>{formatTime(currentTime)}</span>
+              <span>{formatTime(audioRef.current?.duration || 0)}</span>
             </div>
           </div>
 
@@ -272,7 +302,11 @@ export default function PhatAudiobook() {
             </button>
 
             {/* Nút tua 15 giây về trước */}
-            <button onClick={() => setCurrentTime((prevTime) => Math.max(prevTime - 15, 0))} className="text-white">
+            <button onClick={() => {
+                if (audioRef.current) {
+                    audioRef.current.currentTime = Math.max(audioRef.current.currentTime - 15, 0);
+                }
+            }} className="text-white">
               <Image
                 src="/app.body/back15s.png"
                 alt="Tua 15 giây về trước"
@@ -296,7 +330,11 @@ export default function PhatAudiobook() {
             </button>
 
             {/* Nút tua 15 giây về sau */}
-            <button onClick={() => setCurrentTime((prevTime) => Math.min(prevTime + 15, audiobook?.duration || 0))} className="text-white">
+            <button onClick={() => {
+                if (audioRef.current) {
+                    audioRef.current.currentTime = Math.min(audioRef.current.currentTime + 15, audioRef.current.duration || 0);
+                }
+            }} className="text-white">
               <Image
                 src="/app.body/gos15s.png"
                 alt="Tua 15 giây về sau"
@@ -378,11 +416,12 @@ export default function PhatAudiobook() {
               </button>
             </div>
           </div>
+          
 
           <div className="flex justify-center items-center mt-4 w-full max-w-lg">
             <div className="flex gap-4 items-center">
               <Image
-                src="/app.body/phat-audiobook.png"  // Updated image source
+                src={ "/app.body/phat-audiobook.png"}  // Use chapter image if available, fallback to audiobook image
                 alt={currentChapter?.title || 'Chapter Image'}
                 width={50}
                 height={50}
@@ -422,7 +461,12 @@ export default function PhatAudiobook() {
               {[0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((speed) => (
                 <div
                   key={speed}
-                  onClick={() => setPlaybackSpeed(speed)}
+                  onClick={() => {
+                    setPlaybackSpeed(speed);
+                    if (audioRef.current) {
+                        audioRef.current.playbackRate = speed;
+                    }
+                  }}
                   className="flex justify-between items-center p-3 cursor-pointer hover:bg-[#2F3443] rounded-lg border-b border-[#2F3443]"
                 >
                   <span className="text-sm text-white">{speed}X</span>
@@ -500,11 +544,10 @@ export default function PhatAudiobook() {
             <div className="flex justify-between items-center p-4 border-b border-[#2F3443] pt-6">
               <span className="text-[#E0E0E0] text-sm">{chapters.length} tập</span>
               <h2 className="text-lg font-semibold text-white">Danh sách tập</h2>
-              <button className="text-[#E0E0E0]">
+              <button onClick={() => setShowChapterList(false)} className="text-[#E0E0E0]">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                  <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                  <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
               </button>
             </div>
@@ -515,8 +558,7 @@ export default function PhatAudiobook() {
                   onClick={() => {
                     setCurrentChapter(chapter);
                     setShowChapterList(false);
-                    setCurrentTime(0);
-                    setIsPlaying(true);
+                    // Audio will load and play in the useEffect when currentChapter changes
                   }}
                   className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-[#2F3443] ${currentChapter?.id === chapter.id ? 'bg-[#2F3443]' : ''}`}
                 >

@@ -36,9 +36,14 @@ body {
 }
 
 .rounded-full {
-  border-radius: 9999px;
+  border-radius: 999px;
 }
-
+.rounded-full {
+  border-radius: 999px;
+}
+.rounded-category {
+  border-radius: 4px;
+}
 .text-xs {
   font-size: 0.75rem; /* 12px */
 }

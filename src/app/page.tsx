@@ -48,7 +48,7 @@ export default function Home() {
   useEffect(() => {
     const fetchTrendingItems = async () => {
       try {
-        const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/common/trending?type=0&page=0&size=10');
+        const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/common/trending?type=1&page=0&size=10');
         const data = await response.json();
         if (data.code === 200) {
           setTrendingItems(data.data);
@@ -141,13 +141,13 @@ export default function Home() {
               Tâm linh
             </button>
             <button 
-              className="flex-1 flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-md border-l-4 border-orange-500 md:flex-1"
+              className="flex-1 flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-category border-l-4 border-orange-500 md:flex-1"
               onClick={() => router.push('/audiobook/category-list?name=Hồi ký và tiểu sử')}
             >
               Hồi ký và tiểu sử
             </button>
             <button 
-              className="flex-1 flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-md border-l-4 border-purple-500 md:flex-1"
+              className="flex-1 flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-category border-l-4 border-purple-500 md:flex-1"
               onClick={() => router.push('/audiobook/category-list?name=Lịch sử, Văn hoá')}
             >
               Lịch sử, Văn hoá
@@ -156,19 +156,19 @@ export default function Home() {
           {/* Mobile: Second row */}
           <div className="flex flex-wrap gap-2 mt-2 md:mt-0 md:flex-nowrap md:flex-1">
             <button 
-              className="flex-1 flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-md border-l-4 border-yellow-500 md:flex-1"
+              className="flex-1 flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-category border-l-4 border-yellow-500 md:flex-1"
               onClick={() => router.push('/audiobook/category-list?name=Kinh tế')}
             >
               Kinh tế
             </button>
             <button 
-              className="flex-1 flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-md border-l-4 border-blue-500 md:flex-1"
+              className="flex-1 flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-category border-l-4 border-blue-500 md:flex-1"
               onClick={() => router.push('/audiobook/category-list?name=Tài chính, đầu tư')}
             >
               Tài chính, đầu tư
             </button>
             <button 
-              className="flex-1 flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-md border-l-4 border-gray-500 md:flex-1"
+              className="flex-1 flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-category border-l-4 border-gray-500 md:flex-1"
               onClick={() => router.push('/audiobook/category-list?name=Quản lý công ty')}
             >
               Quản lý công ty
@@ -314,7 +314,7 @@ export default function Home() {
       {/* Nút VIP */}
       <div className="bg-[#0f0f0f] p-4 rounded-lg w-full ">
         <button 
-          className="w-full bg-[#FFA500] text-white py-3 rounded-lg font-medium text-center"
+          className="w-full bg-[#FFA500] text-white py-3 rounded-full font-medium text-center"
         >
           Nghe VIP chỉ từ 8.999 đ
         </button>

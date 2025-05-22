@@ -1,8 +1,14 @@
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 const AppHeader: React.FC = () => {
   const router = useRouter();
+  const pathname = usePathname();
+
+  // Hiển thị header chỉ ở trang chủ ('/') và trang podcast ('/pod_cast/podcast')
+  if (pathname !== '/' && pathname !== '/pod_cast/podcast') {
+    return null;
+  }
 
   return (
     <header className="bg-[#1a1a1a] px-4 py-2 flex items-center justify-between ">

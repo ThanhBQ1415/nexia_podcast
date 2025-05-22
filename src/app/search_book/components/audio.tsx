@@ -85,7 +85,7 @@ export default function Audio() {
   };
 
   const handleBookClick = (bookId: number) => {
-    router.push(`audiobookdetail?id=${bookId}`);
+    router.push(`http://localhost:3000/audiobook/audiobookdetail?id=${bookId}`);
   };
 
   if (searchResults.length > 0) {

@@ -1,11 +1,17 @@
 'use client'
-import Image from 'next/image';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import { useRouter, usePathname } from 'next/navigation'; // Import usePathname
 
 function Appfooter() {
     const [activeButton, setActiveButton] = useState<string | null>('Audiobook');
     const router = useRouter();
+    const pathname = usePathname(); // Get current pathname
+
+    // Hide footer on specific paths
+    if (pathname !== '/' && pathname !== '/pod_cast/podcast' && pathname !== '/ca_nhan/canhan') {
+        return null;
+    }
 
     const handleButtonClick = (buttonName: string) => {
         setActiveButton(buttonName);
