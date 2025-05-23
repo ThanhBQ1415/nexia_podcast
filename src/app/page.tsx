@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import React from 'react';
-
+import useSWR from 'swr'; // Import useSWR
 interface CateItem {
   id: number;
   name: string;
@@ -26,11 +26,17 @@ interface CateItem {
   duration: number;
 }
 
+interface Category {
+  id: number;
+  title: string;
+}
+
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [trendingItems, setTrendingItems] = useState<CateItem[]>([]);
   const [spiritualItems, setSpiritualItems] = useState<CateItem[]>([]);
   const [businessItems, setBusinessItems] = useState<CateItem[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]); // New state for categories
   const router = useRouter();
   const totalSlides = 5;
   const images = [
@@ -83,6 +89,20 @@ export default function Home() {
         }
       };
 
+      // Fetch categories from the new API
+      const fetchCategories = async () => {
+        try {
+          const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/common/list-category?type=1&page=0&size=10');
+          const data = await response.json();
+          if (data.code === 200) {
+            setCategories(data.data);
+          }
+        } catch (error) {
+          console.error('Error fetching categories:', error);
+        }
+      };
+
+
       // Add auto login
       try {
         const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/auth/login', {
@@ -112,7 +132,8 @@ export default function Home() {
       await Promise.all([
         fetchTrendingItems(),
         fetchSpiritualItems(),
-        fetchBusinessItems()
+        fetchBusinessItems(),
+        fetchCategories() // Fetch categories
       ]);
     };
 
@@ -123,10 +144,21 @@ export default function Home() {
     router.push(`/audiobook/audiobookdetail?id=${book.id}`);
   };
 
+  // Define border colors to cycle through
+  const borderColors = [
+    'border-green-500',
+    'border-orange-500',
+    'border-purple-500',
+    'border-yellow-500',
+    'border-blue-500',
+    'border-gray-500',
+  ];
+
+
   return (
-    <main className="w-screen min-h-screen bg-[#1a1a1a]" >
+    <main className="w-screen min-h-screen bg-[#1a1a1a] md:container md:mx-auto md:px-4" >
       <div className="h-6 bg-[#1a1a1a]"></div>
-      <div className="relative w-[343px] h-[140px] md:w-[1372px] md:h-[560px] object-cover rounded-xl overflow-hidden bg-black mx-auto flex justify-center">
+      <div className="relative w-[343px] h-[140px] md:w-full md:h-[560px] object-cover rounded-xl overflow-hidden bg-black mx-auto flex justify-center">
         <Image
           src={images[currentSlide]}
           alt={`Podcast background ${currentSlide + 1}`}
@@ -134,10 +166,10 @@ export default function Home() {
           quality={100}
           priority
           className="object-cover"
-          sizes="100vw"
+          sizes="(max-width: 768px) 343px, 100vw"
         />
       </div>
-      <div className="h-6 bg-[#1a1a1a]"></div> 
+      <div className="h-6 bg-[#1a1a1a]"></div>
       <div className="flex justify-center mt-4 space-x-2">
         {images.map((_, index) => (
           <div
@@ -155,7 +187,7 @@ export default function Home() {
       <div className="bg-[#0f0f0f] p-4 rounded-lg w-full mt-4">
         <div className="flex justify-between items-center mb-3">
           <h2 className="text-base font-semibold text-white">Thể loại</h2>
-          <button 
+          <button
             className="text-xl text-white"
             onClick={() => router.push('/audiobook/category')}
           >
@@ -166,45 +198,27 @@ export default function Home() {
         <div className="md:flex md:flex-nowrap md:gap-2">
           {/* Mobile: First row */}
           <div className="flex flex-wrap gap-2 md:flex-nowrap md:flex-1">
-            <button 
-              className="flex-1 flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-md border-l-4 border-green-500 md:flex-1"
-              onClick={() => router.push('/audiobook/category-list?name=Tâm linh')}
-            >
-              Tâm linh
-            </button>
-            <button 
-              className="flex-1 flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-category border-l-4 border-orange-500 md:flex-1"
-              onClick={() => router.push('/audiobook/category-list?name=Hồi ký và tiểu sử')}
-            >
-              Hồi ký và tiểu sử
-            </button>
-            <button 
-              className="flex-1 flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-category border-l-4 border-purple-500 md:flex-1"
-              onClick={() => router.push('/audiobook/category-list?name=Lịch sử, Văn hoá')}
-            >
-              Lịch sử, Văn hoá
-            </button>
+            {categories.slice(0, 3).map((category, index) => ( // Display first 3 categories
+              <button
+                key={category.id}
+                className={` rounded-category flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-md border-l-4 ${borderColors[index % borderColors.length]} md:flex-1`} // Removed flex-1 here
+                onClick={() => router.push(`/audiobook/category-list?name=${encodeURIComponent(category.title)}`)}
+              >
+                {category.title}
+              </button>
+            ))}
           </div>
           {/* Mobile: Second row */}
-          <div className="flex flex-wrap gap-2 mt-2 md:mt-0 md:flex-nowrap md:flex-1">
-            <button 
-              className="flex-1 flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-category border-l-4 border-yellow-500 md:flex-1"
-              onClick={() => router.push('/audiobook/category-list?name=Kinh tế')}
-            >
-              Kinh tế
-            </button>
-            <button 
-              className="flex-1 flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-category border-l-4 border-blue-500 md:flex-1"
-              onClick={() => router.push('/audiobook/category-list?name=Tài chính, đầu tư')}
-            >
-              Tài chính, đầu tư
-            </button>
-            <button 
-              className="flex-1 flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-category border-l-4 border-gray-500 md:flex-1"
-              onClick={() => router.push('/audiobook/category-list?name=Quản lý công ty')}
-            >
-              Quản lý công ty
-            </button>
+          <div className="flex flex-wrap gap-2 mt-2 md:mt-0 md:flex-nowrap md:flex-1 rounded-category">
+             {categories.slice(3, 6).map((category, index) => ( // Display next 3 categories
+              <button
+                key={category.id}
+                className={`flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-category border-l-4 ${borderColors[(index + 3) % borderColors.length]} md:flex-1`} // Removed flex-1 here
+                onClick={() => router.push(`/audiobook/category-list?name=${encodeURIComponent(category.title)}`)}
+              >
+                {category.title}
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -224,7 +238,7 @@ export default function Home() {
               >
                 <div className="relative w-full aspect-[3/4] rounded-lg overflow-hidden">
                   <Image
-                    src={"/app.body/echoes.png"}               
+                    src={"/app.body/echoes.png"}
                     alt={item.name}
                     fill
                     className="object-cover"
@@ -269,7 +283,7 @@ export default function Home() {
               >
                 <div className="relative w-full aspect-[3/4] rounded-lg overflow-hidden">
                   <Image
-                    src={"/app.body/tamlinh-tinhthan.png"}               
+                    src={"/app.body/tamlinh-tinhthan.png"}
                     alt={item.name}
                     fill
                     className="object-cover"
@@ -314,7 +328,181 @@ export default function Home() {
               >
                 <div className="relative w-full aspect-[3/4] rounded-lg overflow-hidden">
                   <Image
-                    src={"/app.body/kinhdoanh-khoinghiep.png"}               
+                    src={"/app.body/kinhdoanh-khoinghiep.png"}
+                    alt={item.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 160px, 20vw"
+                  />
+                  {item.isHot === 1 && (
+                    <div className="absolute top-2 right-2 px-2 py-1 text-xs text-white bg-orange-500 rounded-full">
+                      COIN
+                    </div>
+                  )}
+                </div>
+                <h3 className="mt-2 text-xs text-white truncate line-clamp-1">{item.name}</h3>
+                <div className="mt-1 text-xs text-gray-400">
+                  {item.duration} phút • {item.totalListen} lượt nghe
+                </div>
+                {item.scoreContent > 0 && (
+                  <div className="flex items-center mt-1 text-xs text-yellow-500">
+                    {'★'.repeat(Math.floor(item.scoreContent))}
+                    {item.scoreContent % 1 !== 0 && '★'.slice(0, 1)}
+                    { '☆'.repeat(5 - Math.ceil(item.scoreContent))}
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Cập nhật phần categories */}
+      <div className="bg-[#0f0f0f] p-4 md:p-6 rounded-lg w-full mt-4">
+        <div className="flex justify-between items-center mb-3 md:mb-5">
+          <h2 className="text-base font-semibold text-white md:text-xl">Thể loại</h2>
+          <button
+            className="text-xl text-white transition-colors hover:text-green-500"
+            onClick={() => router.push('/audiobook/category')}
+          >
+            {'>'}
+          </button>
+        </div>
+        <div className="md:flex md:flex-nowrap md:gap-4">
+          {/* First row */}
+          <div className="flex flex-wrap gap-2 md:gap-4 md:flex-nowrap md:flex-1">
+            {categories.slice(0, 3).map((category, index) => (
+              <button
+                key={category.id}
+                className={`rounded-category flex items-center bg-[#1a1a1a] text-white text-sm md:text-base px-3 py-2 md:py-3 rounded-md border-l-4 ${borderColors[index % borderColors.length]} md:flex-1 hover:bg-[#2a2a2a] transition-colors`}
+                onClick={() => router.push(`/audiobook/category-list?name=${encodeURIComponent(category.title)}`)}
+              >
+                {category.title}
+              </button>
+            ))}
+          </div>
+          {/* Second row */}
+          <div className="flex flex-wrap gap-2 mt-2 md:mt-0 md:gap-4 md:flex-nowrap md:flex-1">
+            {categories.slice(3, 6).map((category, index) => (
+              <button
+                key={category.id}
+                className={`flex items-center bg-[#1a1a1a] text-white text-sm md:text-base px-3 py-2 md:py-3 rounded-md border-l-4 ${borderColors[(index + 3) % borderColors.length]} md:flex-1 hover:bg-[#2a2a2a] transition-colors`}
+                onClick={() => router.push(`/audiobook/category-list?name=${encodeURIComponent(category.title)}`)}
+              >
+                {category.title}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Cập nhật phần Trending */}
+      <div className="bg-[#0f0f0f] p-4 md:p-6 rounded-lg w-full">
+        <div className="flex justify-between items-center mb-3 md:mb-5">
+          <h2 className="text-base font-semibold text-white md:text-xl">Trending</h2>
+          <button className="text-xl text-white transition-colors hover:text-green-500">{'>'}</button>
+        </div>
+        <div className="overflow-x-auto md:overflow-visible">
+          <div className="flex gap-4 min-w-max md:grid md:grid-cols-5 md:gap-6 md:min-w-0">
+            {trendingItems.map((item) => (
+              <button
+                key={item.id}
+                className="relative w-[160px] md:w-auto text-left focus:outline-none group"
+                onClick={() => handleBookClick(item)}
+              >
+                <div className="relative w-full aspect-[3/4] rounded-lg overflow-hidden group-hover:transform group-hover:scale-105 transition-transform">
+                  <Image
+                    src={"/app.body/echoes.png"}
+                    alt={item.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 160px, 20vw"
+                  />
+                  {item.isHot === 1 && (
+                    <div className="absolute top-2 right-2 px-2 py-1 text-xs text-white bg-yellow-500 rounded-full md:text-sm">
+                      HOT
+                    </div>
+                  )}
+                </div>
+                <h3 className="mt-2 text-xs text-white truncate transition-colors md:text-sm line-clamp-1 group-hover:text-green-500">{item.name}</h3>
+                <div className="mt-1 text-xs text-gray-400 md:text-sm">
+                  {item.duration} phút • {item.totalListen} lượt nghe
+                </div>
+                {item.scoreContent > 0 && (
+                  <div className="flex items-center mt-1 text-xs text-yellow-500 md:text-sm">
+                    {'★'.repeat(Math.floor(item.scoreContent))}
+                    {item.scoreContent % 1 !== 0 && '★'.slice(0, 1)}
+                    {'☆'.repeat(5 - Math.ceil(item.scoreContent))}
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Phần Tâm linh - Tinh thần */}
+      <div className="bg-[#0f0f0f] p-4 rounded-lg w-full ">
+        <div className="flex justify-between items-center mb-3">
+          <h2 className="text-base font-semibold text-white">Tâm linh - Tinh thần</h2>
+          <button className="text-xl text-white">{'>'}</button>
+        </div>
+        <div className="overflow-x-auto">
+          <div className="flex gap-4 min-w-max md:grid md:grid-cols-5 md:min-w-0">
+            {spiritualItems.map((item) => (
+              <button
+                key={item.id}
+                className="relative w-[160px] md:w-auto text-left focus:outline-none"
+                onClick={() => handleBookClick(item)}
+              >
+                <div className="relative w-full aspect-[3/4] rounded-lg overflow-hidden">
+                  <Image
+                    src={"/app.body/tamlinh-tinhthan.png"}
+                    alt={item.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 160px, 20vw"
+                  />
+                  {item.isHot === 1 && (
+                    <div className="absolute top-2 right-2 px-2 py-1 text-xs text-white bg-yellow-500 rounded-full">
+                      VIP
+                    </div>
+                  )}
+                </div>
+                <h3 className="mt-2 text-xs text-white truncate line-clamp-1">{item.name}</h3>
+                <div className="mt-1 text-xs text-gray-400">
+                  {item.duration} phút • {item.totalListen} lượt nghe
+                </div>
+                {item.scoreContent > 0 && (
+                  <div className="flex items-center mt-1 text-xs text-yellow-500">
+                    {'★'.repeat(Math.floor(item.scoreContent))}
+                    {item.scoreContent % 1 !== 0 && '★'.slice(0, 1)}
+                    { '☆'.repeat(5 - Math.ceil(item.scoreContent))}
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Phần Kinh doanh - Khởi nghiệp */}
+      <div className="bg-[#0f0f0f] p-4 rounded-lg w-full ">
+        <div className="flex justify-between items-center mb-3">
+          <h2 className="text-base font-semibold text-white">Kinh doanh - Khởi nghiệp</h2>
+          <button className="text-xl text-white">{'>'}</button>
+        </div>
+        <div className="overflow-x-auto">
+          <div className="flex gap-4 min-w-max md:grid md:grid-cols-5 md:min-w-0">
+            {businessItems.map((item) => (
+              <button
+                key={item.id}
+                className="relative w-[160px] md:w-auto text-left focus:outline-none"
+                onClick={() => handleBookClick(item)}
+              >
+                <div className="relative w-full aspect-[3/4] rounded-lg overflow-hidden">
+                  <Image
+                    src={"/app.body/kinhdoanh-khoinghiep.png"}
                     alt={item.name}
                     fill
                     className="object-cover"
@@ -344,10 +532,8 @@ export default function Home() {
       </div>
 
       {/* Nút VIP */}
-      <div className="bg-[#0f0f0f] p-4 rounded-lg w-full ">
-        <button 
-          className="w-full bg-[#FFA500] text-white py-3 rounded-full font-medium text-center"
-        >
+      <div className="bg-[#0f0f0f] p-4 md:p-6 rounded-lg w-full">
+        <button className="w-full bg-[#FFA500] text-white py-3 md:py-4 rounded-full font-medium text-center text-sm md:text-base hover:bg-[#FF8C00] transition-colors">
           Nghe VIP chỉ từ 8.999 đ
         </button>
       </div>

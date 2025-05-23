@@ -1,12 +1,27 @@
 'use client';
 
-import { useRouter} from 'next/navigation';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+
+// Interface for the structure of a category item from the API
+interface ApiCategoryItem {
+  id: number;
+  title: string;
+}
+
+// Interface for the expected API response structure
+interface ApiResponse {
+  code: number;
+  data: ApiCategoryItem[];
+  message: string;
+}
+
+// Updated local Category interface for frontend use
 interface Category {
-  id: string;
+  id: string; // Keep as string for consistency with existing router.push
   name: string;
-  icon: string;
-  color: string;
+  // icon: string; // Removed as not provided by this API
+  color: string; // Will be assigned programmatically
 }
 
 export default function SearchPage() {
@@ -14,14 +29,57 @@ export default function SearchPage() {
   const [activeTab, setActiveTab] = useState('audiobook');
   const [searchTerm, setSearchTerm] = useState('');
   
-  const categories: Category[] = [
-    { id: '1', name: 'Tâm linh', icon: '/iconcategory-list/tamlinh-icon.png', color: 'bg-purple-500' },
-    { id: '2', name: 'Hồi ký và tiểu sử', icon: '/iconcategory-list/hoiky-icon.png', color: 'bg-orange-500' },
-    { id: '3', name: 'Kinh tế', icon: '/iconcategory-list/kinhte-icon.png', color: 'bg-yellow-500' },
-    { id: '4', name: 'Tài chính, đầu tư', icon: '/iconcategory-list/taichinh-icon.png', color: 'bg-blue-500' },
-    { id: '5', name: 'Lịch sử, Văn hoá', icon: '/iconcategory-list/lichsu-icon.png', color: 'bg-red-500' },
-    { id: '6', name: 'Quản lý công ty', icon: '/iconcategory-list/quanly-icon.png', color: 'bg-green-500' },
+  const [apiCategories, setApiCategories] = useState<Category[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [errorCategories, setErrorCategories] = useState<string | null>(null);
+
+  // Predefined colors to cycle through for categories
+  const predefinedColors = [
+    'bg-purple-500',
+    'bg-orange-500',
+    'bg-yellow-500',
+    'bg-blue-500',
+    'bg-red-500',
+    'bg-green-500',
+    'bg-pink-500',
+    'bg-teal-500',
+    'bg-indigo-500',
+    'bg-cyan-500',
   ];
+
+  useEffect(() => {
+    async function fetchCategories() {
+      setLoadingCategories(true);
+      setErrorCategories(null);
+      try {
+        // Fetch categories from the API
+        const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/common/list-category?type=1&page=0&size=10');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result: ApiResponse = await response.json();
+
+        if (result.code === 200 && result.data) {
+          const transformedCategories: Category[] = result.data.map((apiCat, index) => ({
+            id: String(apiCat.id), // Convert API's number id to string
+            name: apiCat.title,    // Map title to name
+            color: predefinedColors[index % predefinedColors.length], // Assign color
+          }));
+          setApiCategories(transformedCategories);
+        } else {
+          throw new Error(result.message || 'Failed to fetch categories');
+        }
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+        setErrorCategories(error instanceof Error ? error.message : String(error));
+        // setApiCategories([]); // Optionally clear categories or set to a default
+      } finally {
+        setLoadingCategories(false);
+      }
+    }
+
+    fetchCategories();
+  }, []); // Empty dependency array ensures this runs once on mount
 
   const handleSearch = (keyword: string) => {
     router.push(`/search_book/search-detail?keyword=${encodeURIComponent(keyword)}`);
@@ -47,7 +105,7 @@ export default function SearchPage() {
           />
           <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
             <img 
-              src="/app.header/search-icon.png"
+              src="/app.header/search-icon.png" // Ensure this path is correct in your public folder
               alt="Search"
               className="w-5 h-5 opacity-60"
             />
@@ -100,20 +158,27 @@ export default function SearchPage() {
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-[10px]">
-          {categories.map((category) => (
-            <button
-              key={category.id}
-              onClick={() => router.push(`/audiobook/category-list?categoryId=${category.id}&name=${encodeURIComponent(category.name)}`)}
-              className="w-[165.5px] h-[40px] bg-[#1F222A] rounded-[4px] hover:opacity-80"
-            >
-              <div className="flex gap-2 items-center h-full px-[10px] py-[8px]">
-                <div className={`w-[3px] h-6 ${category.color} rounded`}></div>
-                <span className="text-white truncate">{category.name}</span>
-              </div>
-            </button>
-          ))}
-        </div>
+        {loadingCategories && <p>Loading categories...</p>}
+        {errorCategories && <p className="text-red-500">Error loading categories: {errorCategories}</p>}
+        {!loadingCategories && !errorCategories && (
+          <div className="grid grid-cols-2 gap-[10px]">
+            {apiCategories.map((category) => (
+              <button
+                key={category.id}
+                onClick={() => router.push(`/audiobook/category-list?categoryId=${category.id}&name=${encodeURIComponent(category.name)}`)}
+                className="w-[165.5px] h-[40px] bg-[#1F222A] rounded-[4px] hover:opacity-80"
+              >
+                <div className="flex gap-2 items-center h-full px-[10px] py-[8px]">
+                  <div className={`w-[3px] h-6 ${category.color} rounded`}></div>
+                  <span className="text-white truncate">{category.name}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+         {!loadingCategories && !errorCategories && apiCategories.length === 0 && (
+            <p>No categories found.</p>
+        )}
       </div>
     </div>
   );

@@ -1,32 +1,54 @@
 'use client'
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // Import useEffect
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 interface Category {
   id: number;
-  name: string;
-  color: string;
+  title: string; // Changed from 'name' to 'title' to match API
 }
 
 export default function CategoryPage() {
   const router = useRouter();
-  const [categories, setCategories] = useState<Category[]>([
-    { id: 1, name: 'Tâm linh', color: 'border-green-500' },
-    { id: 2, name: 'Hồi ký và tiểu sử', color: 'border-orange-500' },
-    { id: 3, name: 'Kinh tế', color: 'border-yellow-500' },
-    { id: 4, name: 'Tài chính, đầu tư', color: 'border-blue-500' },
-    { id: 5, name: 'Lịch sử, Văn hoá', color: 'border-purple-500' },
-    { id: 6, name: 'Quản lý công ty', color: 'border-blue-500' },
-  ]);
+  const [categories, setCategories] = useState<Category[]>([]); // Initialize as empty array
+
+  // Define border colors to cycle through
+  const borderColors = [
+    'border-green-500',
+    'border-orange-500',
+    'border-yellow-500',
+    'border-blue-500',
+    'border-purple-500',
+    'border-gray-500',
+  ];
+
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/common/list-category?type=1&page=0&size=10');
+        const data = await response.json();
+        if (data.code === 200) {
+          setCategories(data.data); // Set categories state with fetched data
+        } else {
+          console.error('Error fetching categories:', data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []); // Empty dependency array means this runs once on mount
+
 
   const handleBack = () => {
     router.push('/')
   };
 
-  const handleCategoryClick = (categoryId: number) => {
-    // Truyền categoryId qua URL
-    router.push(`/audiobook/category-list?categoryId=${categoryId}&name=${encodeURIComponent(categories.find(c => c.id === categoryId)?.name || '')}`);
+  const handleCategoryClick = (category: Category) => { // Pass the category object
+    // Truyền categoryId và title qua URL
+    router.push(`/audiobook/category-list?categoryId=${category.id}&name=${encodeURIComponent(category.title)}`);
   };
 
   return (
@@ -45,14 +67,14 @@ export default function CategoryPage() {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 p-4">
-        {categories.map((category) => (
+      <div className="grid grid-cols-2 gap-3 p-4 rounded-category">
+        {categories.map((category, index) => ( // Map over fetched categories
           <button
             key={category.id}
-            onClick={() => handleCategoryClick(category.id)}
-            className={`flex items-center bg-[#1a1a1a] text-white text-sm px-3 py-2 rounded-md border-l-4 ${category.color}`}
+            onClick={() => handleCategoryClick(category)} // Pass the category object
+            className={`flex items-center bg-[#1a1a1a] rounded-category text-white text-sm px-3 py-2 rounded-md border-l-4 ${borderColors[index % borderColors.length]}`} // Use index for color cycling
           >
-            {category.name}
+            {category.title} {/* Use category.title */}
           </button>
         ))}
       </div>

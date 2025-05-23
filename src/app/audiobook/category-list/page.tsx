@@ -25,6 +25,11 @@ interface CateItem {
   duration: number;
 }
 
+interface Category { // Updated interface to match API response
+  id: number;
+  title: string;
+}
+
 export default function CategoryListPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -35,17 +40,7 @@ export default function CategoryListPage() {
   const [showSortDialog, setShowSortDialog] = useState(false);
   const [sortBy, setSortBy] = useState('all'); // Thêm state để theo dõi tiêu chí sắp xếp
   const [originalItems, setOriginalItems] = useState<CateItem[]>([]); // Thêm state để lưu danh sách gốc
-
-  // Danh sách các thể loại
-  const categories = [
-    { id: 'all', name: 'Tất cả', icon: '/iconcategory-list/all-icon.png' },
-    { id: '1', name: 'Tâm linh', icon: '/iconcategory-list/tamlinh-icon.png' },
-    { id: '2', name: 'Hồi ký và tiểu sử', icon: '/iconcategory-list/hoiky-icon.png' },
-    { id: '3', name: 'Kinh tế', icon: '/iconcategory-list/kinhte-icon.png' },
-    { id: '4', name: 'Tài chính, đầu tư', icon: '/iconcategory-list/taichinh-icon.png' },
-    { id: '5', name: 'Lịch sử, Văn hoá', icon: '/iconcategory-list/lichsu-icon.png' },
-    { id: '6', name: 'Quản lý công ty', icon: '/iconcategory-list/quanly-icon.png' },
-  ];
+  const [categories, setCategories] = useState<Category[]>([]); // State để lưu danh sách thể loại từ API
 
   // Danh sách các tùy chọn sắp xếp
   const sortOptions = [
@@ -55,34 +50,54 @@ export default function CategoryListPage() {
     { id: 'free', name: 'Miễn phí' },
   ];
 
+  // Fetch category list from API
+  useEffect(() => {
+    const fetchCategoryList = async () => {
+      try {
+        const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/common/list-category?type=1&page=0&size=10');
+        const data = await response.json();
+        if (data.code === 200) {
+          // Add 'Tất cả' option at the beginning
+          setCategories([{ id: 0, title: 'Tất cả' }, ...data.data]); // Assuming 'all' corresponds to id 0 or similar logic
+        } else {
+          console.error('Error fetching category list:', data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching category list:', error);
+      }
+    };
+
+    fetchCategoryList();
+  }, []); // Fetch category list only once on mount
+
   useEffect(() => {
     const fetchCategoryItems = async () => {
       try {
         // Xây dựng URL với tham số thể loại nếu không phải 'all'
         let url = 'http://192.168.1.88:8386/nexia-service/v1/common/category?page=0&size=10&type=1';
-        
-        // Thêm tham số categoryId nếu activeTab không phải 'all'
-        if (activeTab !== 'all') {
+
+        // Thêm tham số categoryId nếu activeTab không phải 'all' (hoặc id 0)
+        if (activeTab !== 'all' && activeTab !== '0') {
           url += `&categoryId=${activeTab}`;
         }
-        
+
         // Luôn lấy dữ liệu theo id:asc để đảm bảo thứ tự nhất quán
         url += '&sort=id:asc';
-        
+
         console.log('Fetching URL:', url);
-        
+
         const response = await fetch(url);
         const data = await response.json();
         if (data.code === 200) {
           const items = data.data.cateItem;
 
           setOriginalItems(items);
-          
+
 
           let sortedItems = [...items];
-          
+
           if (sortBy === 'newest') {
- 
+
             sortedItems = sortedItems.sort((a, b) => {
               const [da, ma, ya] = a.publisherDate.split('/').map(Number);
               const [db, mb, yb] = b.publisherDate.split('/').map(Number);
@@ -105,7 +120,7 @@ export default function CategoryListPage() {
             // Nếu là 'all', sử dụng danh sách gốc
             console.log('Hiển thị danh sách gốc:', sortedItems);
           }
-          
+
           setCategoryItems(sortedItems);
         }
       } catch (error) {
@@ -129,8 +144,8 @@ export default function CategoryListPage() {
     router.push(`/audiobook/audiobookdetail?id=${book.id}`);
   };
 
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
+  const handleTabChange = (tabId: number | string) => { // Accept number or string for 'all'
+    setActiveTab(String(tabId)); // Ensure activeTab is always a string
   };
 
   const toggleSortDialog = () => {
@@ -185,17 +200,17 @@ export default function CategoryListPage() {
 
       {/* Tabs */}
       <div className="flex overflow-x-auto p-2 space-x-2 bg-[#1a1a1a] scrollbar-hide sticky top-16 z-10">
-        {categories.map((category) => (
-          <button 
+        {categories.map((category) => ( // Map over fetched categories
+          <button
             key={category.id}
             className={`px-4 md:px-6 py-2 text-sm md:text-base rounded-full whitespace-nowrap transition-all duration-150
-              ${activeTab === category.id 
-                ? 'bg-white text-black font-semibold shadow-md' 
+              ${activeTab === String(category.id) // Compare with string version of id
+                ? 'bg-white text-black font-semibold shadow-md'
                 : 'bg-[#222] text-white hover:bg-[#333]'
               }`}
-            onClick={() => handleTabChange(category.id)}
+            onClick={() => handleTabChange(category.id)} // Pass category.id
           >
-            {category.name}
+            {category.title} {/* Use category.title */}
           </button>
         ))}
       </div>
