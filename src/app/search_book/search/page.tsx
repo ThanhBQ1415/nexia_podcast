@@ -31,7 +31,7 @@ export default function SearchPage() {
     <div className="min-h-screen bg-[#181A20] text-white p-4">
       {/* Search header */}
       <div className="flex gap-4 items-center mb-6">
-        <button onClick={() => router.back()}>
+        <button onClick={() => router.push('/')}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M15 19.5L7.5 12L15 4.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>

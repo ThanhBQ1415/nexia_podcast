@@ -122,7 +122,7 @@ export default function CategoryListPage() {
   };
 
   const handleBack = () => {
-    router.back();
+    router.push('/')
   };
 
   const handleBookClick = (book: CateItem) => {

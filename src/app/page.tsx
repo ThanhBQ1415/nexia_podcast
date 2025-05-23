@@ -46,46 +46,78 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const fetchTrendingItems = async () => {
+    const fetchData = async () => {
+      const fetchTrendingItems = async () => {
+        try {
+          const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/common/trending?type=1&page=0&size=10');
+          const data = await response.json();
+          if (data.code === 200) {
+            setTrendingItems(data.data);
+          }
+        } catch (error) {
+          console.error('Error fetching trending items:', error);
+        }
+      };
+
+      const fetchSpiritualItems = async () => {
+        try {
+          const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/common/category?sort=id:asc&page=0&size=10&type=1');
+          const data = await response.json();
+          if (data.code === 200) {
+            setSpiritualItems(data.data.cateItem);
+          }
+        } catch (error) {
+          console.error('Error fetching spiritual items:', error);
+        }
+      };
+
+      const fetchBusinessItems = async () => {
+        try {
+          const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/common/category?sort=id:asc&page=0&size=10&type=1');
+          const data = await response.json();
+          if (data.code === 200) {
+            setBusinessItems(data.data.cateItem);
+          }
+        } catch (error) {
+          console.error('Error fetching business items:', error);
+        }
+      };
+
+      // Add auto login
       try {
-        const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/common/trending?type=1&page=0&size=10');
+        const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            "username": "TestUser2",
+            "password": "123456a@A"
+          }),
+        });
+
         const data = await response.json();
-        if (data.code === 200) {
-          setTrendingItems(data.data);
+
+        if (response.ok && data.accessToken) {
+          localStorage.setItem('accessToken', data.accessToken);
+          console.log('Auto login successful, accessToken stored:', data.accessToken);
+        } else {
+          console.error('Auto login failed:', data.message || 'Unknown error');
         }
       } catch (error) {
-        console.error('Error fetching trending items:', error);
+        console.error('Error during auto login:', error);
       }
+
+      // Execute all fetch functions
+      await Promise.all([
+        fetchTrendingItems(),
+        fetchSpiritualItems(),
+        fetchBusinessItems()
+      ]);
     };
 
-    const fetchSpiritualItems = async () => {
-      try {
-        const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/common/category?sort=id:asc&page=0&size=10&type=1');
-        const data = await response.json();
-        if (data.code === 200) {
-          setSpiritualItems(data.data.cateItem);
-        }
-      } catch (error) {
-        console.error('Error fetching spiritual items:', error);
-      }
-    };
-
-    const fetchBusinessItems = async () => {
-      try {
-        const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/common/category?sort=id:asc&page=0&size=10&type=1');
-        const data = await response.json();
-        if (data.code === 200) {
-          setBusinessItems(data.data.cateItem);
-        }
-      } catch (error) {
-        console.error('Error fetching business items:', error);
-      }
-    };
-
-    fetchTrendingItems();
-    fetchSpiritualItems();
-    fetchBusinessItems();
-  }, []);
+    fetchData();
+  }, []); // Empty dependency array means this runs once on mount
 
   const handleBookClick = (book: CateItem) => {
     router.push(`/audiobook/audiobookdetail?id=${book.id}`);

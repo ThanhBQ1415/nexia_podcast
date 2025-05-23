@@ -67,7 +67,10 @@ export default function PhatAudiobook() {
   const [selectedTimer, setSelectedTimer] = useState<string | number>('Không hẹn giờ');
   const audioRef = useRef<HTMLAudioElement>(null); // Ensure audioRef is defined
 
-
+  const [showFeedbackDialog, setShowFeedbackDialog] = useState(false); // Thêm state cho dialog feedback
+  const [feedbackInputText, setFeedbackInputText] = useState('');
+  const [starRating, setStarRating] = useState(4);
+  const [reviewComment, setReviewComment] = useState('');
 
   useEffect(() => {
     if (currentChapter) {
@@ -181,6 +184,90 @@ export default function PhatAudiobook() {
   };
 
 
+
+
+  // Component phụ trợ cho Icon Sao
+  const StarIcon = ({ filled, onClick }: { filled: boolean; onClick: () => void }) => (
+    <button type="button" onClick={onClick} className="focus:outline-none">
+      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 21 20" fill="none">
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M9.94341 17.4783L5.61528 19.8562C5.03065 20.1774 4.30756 19.9425 4.0002 19.3316C3.87781 19.0883 3.83558 18.8096 3.88004 18.5387L4.70664 13.5023C4.77318 13.0969 4.64455 12.6833 4.36269 12.3961L0.861159 8.82936C0.388187 8.34758 0.378509 7.55634 0.839542 7.06208C1.02313 6.86526 1.26368 6.73717 1.52396 6.69765L6.36296 5.96285C6.75249 5.9037 7.08922 5.64804 7.26342 5.27918L9.42749 0.69694C9.7198 0.0779898 10.4369 -0.176136 11.0292 0.129334C11.2651 0.250974 11.456 0.450471 11.5724 0.69694L13.7364 5.27918C13.9106 5.64804 14.2474 5.9037 14.6369 5.96285L19.4759 6.69765C20.1295 6.7969 20.5824 7.43109 20.4874 8.11414C20.4496 8.38613 20.327 8.63751 20.1387 8.82936L16.6372 12.3961C16.3553 12.6833 16.2267 13.0969 16.2932 13.5023L17.1198 18.5387C17.2315 19.219 16.7942 19.8651 16.1433 19.9818C15.884 20.0282 15.6174 19.9841 15.3846 19.8562L11.0564 17.4783C10.708 17.2869 10.2918 17.2869 9.94341 17.4783Z"
+          fill={filled ? "#FFD300" : "#6B7280"} // Màu xám cho sao chưa chọn
+        />
+      </svg>
+    </button>
+  );
+
+  const handleSendIconClick = () => {
+    if (feedbackInputText.trim() !== '') { // Chỉ hiển thị dialog nếu có nội dung
+      setShowFeedbackDialog(true);
+    }
+  };
+
+  const handleCloseFeedbackDialog = () => {
+    setShowFeedbackDialog(false);
+    setReviewComment(''); // Reset textarea trong dialog
+    setStarRating(4);     // Reset đánh giá sao về mặc định
+  };
+
+  const handleSubmitReview = async () => { // Make the function async
+    if (reviewComment.trim() === '') {
+      // Optionally show an error if comment is empty, although the send icon is hidden
+      console.log('Comment is empty');
+      return;
+    }
+
+    const accessToken = localStorage.getItem('accessToken'); // Get token from localStorage
+    const contentId = bookId; // Use bookId as contentId
+    const userName = 'hung'; // Hardcoded as per image, consider making this dynamic if needed
+    const type = 1; // Hardcoded as per image
+
+    const apiUrl = `http://192.168.1.88:8386/nexia-service/v1/secure/rate?type=${type}&userName=${userName}&contentId=${contentId}&rateStar=${starRating}&content=${encodeURIComponent(reviewComment)}`;
+
+    const headers: HeadersInit = {
+      'userId': '1', // As per existing code and image
+      'Client-Type': 'Web', // As per image
+      'Revision': '1', // As per image
+      'Content-Type': 'application/json' // Standard header for POST requests, even with query params
+    };
+
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: headers,
+        // No body needed as per the image showing params in query
+      });
+
+      const data = await response.json();
+
+      if (data.code === 200) {
+        console.log('Đánh giá đã được gửi thành công:', data);
+        // TODO: Cập nhật UI hoặc state nếu cần sau khi gửi thành công (ví dụ: hiển thị thông báo)
+      } else {
+        console.error('Lỗi khi gửi đánh giá:', data.message);
+        // TODO: Xử lý lỗi, hiển thị thông báo lỗi cho người dùng
+        setError(data.message || 'Có lỗi xảy ra khi gửi đánh giá');
+      }
+    } catch (err) {
+      console.error('Lỗi kết nối khi gửi đánh giá:', err);
+      // TODO: Xử lý lỗi kết nối
+      setError('Không thể kết nối đến server để gửi đánh giá');
+    } finally {
+      // Always close dialog and reset state regardless of success or failure
+      setShowFeedbackDialog(false);
+      setFeedbackInputText(''); // Xóa nội dung ở thanh input dưới cùng
+      setReviewComment('');     // Xóa nội dung textarea trong dialog
+      setStarRating(4);         // Reset đánh giá sao
+    }
+  };
+
+
   if (loading) {
     return <div className="flex justify-center items-center min-h-screen text-center text-gray-400 bg-black">Đang tải...</div>;
   }
@@ -227,7 +314,7 @@ export default function PhatAudiobook() {
       <div className="relative z-10">
         {/* Header */}
         <div className="flex justify-between items-center p-4">
-          <button onClick={() => router.push(`/audiobook/audiobookdetail?id=${bookId}`)} className="text-white">
+          <button onClick={() => router.push('/')} className="text-white">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M15 18l-6-6 6-6" />
             </svg>
@@ -582,6 +669,77 @@ export default function PhatAudiobook() {
           </div>
         </div>
       )}
+
+
+
+
+
+
+ {/* New Feedback Section */}
+ <div className="flex fixed right-0 bottom-0 left-0 z-20 gap-4 items-center p-4 w-full backdrop-blur-sm bg-white/10">
+        <div className="overflow-hidden flex-shrink-0 w-8 h-8 rounded-full">
+          <Image src="/app.body/phat-audiobook.png" alt="User Avatar" width={32} height={32} className="object-cover" />
+        </div>
+        <div className="flex flex-1 items-center gap-2.5 p-2 rounded-full bg-white/10"> {/* Hoặc bg-white/8 như code gốc*/}
+          <input
+            type="text"
+            placeholder="Gửi góp ý cho nội dung này"
+            className="flex-1 bg-transparent text-white placeholder-[#E0E0E0] focus:outline-none px-2 text-sm"
+            value={feedbackInputText} // Liên kết với state
+            onChange={(e) => setFeedbackInputText(e.target.value)} // Cập nhật state
+          />
+        </div>
+        <button className="flex-shrink-0 w-7 h-7" onClick={handleSendIconClick}> {/* Gắn sự kiện click */}
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <path d="M26.5808 1.44248C25.9139 0.757968 24.9268 0.502953 24.0064 0.77139L2.54432 7.01254C1.57326 7.28231 0.884975 8.05675 0.699566 9.04057C0.510155 10.0418 1.17176 11.3129 2.03611 11.8444L8.74686 15.9689C9.43514 16.3917 10.3235 16.2857 10.8931 15.7112L18.5776 7.97891C18.9644 7.57625 19.6046 7.57625 19.9915 7.97891C20.3783 8.36814 20.3783 8.99897 19.9915 9.40162L12.2936 17.1353C11.7227 17.7084 11.616 18.6009 12.0362 19.2935L16.1366 26.0715C16.6167 26.8768 17.4438 27.3332 18.3508 27.3332C18.4575 27.3332 18.5776 27.3332 18.6843 27.3197C19.7247 27.1855 20.5517 26.4742 20.8585 25.4675L27.2211 4.03289C27.5012 3.12021 27.2478 2.12699 26.5808 1.44248" fill="#06C149"/>
+          </svg>
+        </button>
+      </div>
+
+
+
+{/* Feedback Dialog - MỚI */}
+{showFeedbackDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-[100] p-4"> {/* Đảm bảo z-index cao nhất */}
+          <div className="flex flex-col items-center gap-4 rounded-xl bg-[#35383F] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] p-4 w-[321px]">
+            <h2 className="mt-2 text-xl font-semibold text-white">Đánh giá và nhận xét</h2>
+            <div className="flex gap-2 py-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <StarIcon
+                  key={star}
+                  filled={star <= starRating}
+                  onClick={() => setStarRating(star)}
+                />
+              ))}
+            </div>
+            <textarea
+              className="w-full h-28 p-3 rounded-lg bg-[#4A4D57] text-white placeholder-gray-300 focus:outline-none resize-none text-sm"
+              placeholder="Hãy cho chúng mình một vài nhận xét & đóng góp ý kiến nhé! Ví dụ : Cảm nhận về nội dung, góp ý nhạc nền,...."
+              value={reviewComment}
+              onChange={(e) => setReviewComment(e.target.value)}
+            />
+            <div className="flex gap-3 justify-between mt-2 w-full">
+              <button
+                onClick={handleCloseFeedbackDialog}
+                className="flex-1 py-3 rounded-full bg-[#4A4D57] text-white text-base font-medium hover:bg-[#5f626d] transition-colors"
+              >
+                Bỏ qua
+              </button>
+              <button
+                onClick={handleSubmitReview}
+                className="flex-1 py-3 rounded-full bg-[#06C149] text-white text-base font-medium hover:bg-green-600 transition-colors"
+              >
+                Gửi đánh giá
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+
+
+
     </div>
   );
 }

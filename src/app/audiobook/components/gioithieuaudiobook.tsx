@@ -1,7 +1,8 @@
 'use client'
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../../Redux/Store';
+import useSWR from 'swr'
 
 interface BookDetail {
   id: number;
@@ -27,54 +28,39 @@ interface RatingData {
   totalRatings: number;
 }
 
+const fetcher = async (url: string) => {
+  const response = await fetch(url, {
+    headers: { 'userId': '1' }
+  });
+  const data = await response.json();
+  if (data.code === 200) {
+    return data.data;
+  }
+  throw new Error('Không thể kết nối đến server');
+};
+
 export default function GioiThieu() {
   const bookId = useSelector((state: RootState) => state.audiobook.bookId);
-  const [bookDetail, setBookDetail] = useState<BookDetail | null>(null);
-  const [ratingData, setRatingData] = useState<RatingData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  
+  const { data: bookDetail, error: detailError } = useSWR<BookDetail>(
+    bookId ? `http://192.168.1.88:8386/nexia-service/v1/common/detail?type=1&id=${bookId}` : null,
+    fetcher
+  );
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!bookId) return;
+  const { data: ratingData, error: ratingError } = useSWR<RatingData>(
+    bookId ? `http://192.168.1.88:8386/nexia-service/v1/common/rating?type=1&id=${bookId}&page=0&size=10` : null,
+    fetcher
+  );
 
-      try {
-        setLoading(true);
-        const [detailResponse, ratingResponse] = await Promise.all([
-          fetch(`http://192.168.1.88:8386/nexia-service/v1/common/detail?type=1&id=${bookId}`, {
-            headers: { 'userId': '1' }
-          }),
-          fetch(`http://192.168.1.88:8386/nexia-service/v1/common/rating?type=1&id=${bookId}&page=0&size=10`, {
-            headers: { 'userId': '1' }
-          })
-        ]);
+  const isLoading = !bookDetail && !detailError;
+  const error = detailError || ratingError;
 
-        const detailData = await detailResponse.json();
-        const ratingData = await ratingResponse.json();
-        
-        if (detailData.code === 200) {
-          setBookDetail(detailData.data);
-        }
-        
-        if (ratingData.code === 200) {
-          setRatingData(ratingData.data);
-        }
-      } catch (err) {
-        setError('Không thể kết nối đến server');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [bookId]);
-
-  if (loading) {
+  if (isLoading) {
     return <div className="text-center text-gray-400">Đang tải...</div>;
   }
 
   if (error) {
-    return <div className="text-center text-red-500">{error}</div>;
+    return <div className="text-center text-red-500">Không thể kết nối đến server</div>;
   }
 
   if (!bookDetail) {

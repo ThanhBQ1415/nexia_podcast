@@ -21,7 +21,7 @@ export default function CategoryPage() {
   ]);
 
   const handleBack = () => {
-    router.back();
+    router.push('/')
   };
 
   const handleCategoryClick = (categoryId: number) => {
