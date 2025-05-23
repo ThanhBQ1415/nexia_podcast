@@ -55,10 +55,19 @@ export default function Home() {
     const fetchData = async () => {
       const fetchTrendingItems = async () => {
         try {
+          // Kiểm tra cache trước
+          const cachedData = localStorage.getItem('trending_items');
+          if (cachedData) {
+            setTrendingItems(JSON.parse(cachedData));
+            return;
+          }
+
           const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/common/trending?type=1&page=0&size=10');
           const data = await response.json();
           if (data.code === 200) {
             setTrendingItems(data.data);
+            // Lưu vào cache
+            localStorage.setItem('trending_items', JSON.stringify(data.data));
           }
         } catch (error) {
           console.error('Error fetching trending items:', error);
@@ -67,10 +76,19 @@ export default function Home() {
 
       const fetchSpiritualItems = async () => {
         try {
+          // Kiểm tra cache trước
+          const cachedData = localStorage.getItem('spiritual_items');
+          if (cachedData) {
+            setSpiritualItems(JSON.parse(cachedData));
+            return;
+          }
+
           const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/common/category?sort=id:asc&page=0&size=10&type=1');
           const data = await response.json();
           if (data.code === 200) {
             setSpiritualItems(data.data.cateItem);
+            // Lưu vào cache
+            localStorage.setItem('spiritual_items', JSON.stringify(data.data.cateItem));
           }
         } catch (error) {
           console.error('Error fetching spiritual items:', error);
@@ -79,23 +97,40 @@ export default function Home() {
 
       const fetchBusinessItems = async () => {
         try {
+          // Kiểm tra cache trước
+          const cachedData = localStorage.getItem('business_items');
+          if (cachedData) {
+            setBusinessItems(JSON.parse(cachedData));
+            return;
+          }
+
           const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/common/category?sort=id:asc&page=0&size=10&type=1');
           const data = await response.json();
           if (data.code === 200) {
             setBusinessItems(data.data.cateItem);
+            // Lưu vào cache
+            localStorage.setItem('business_items', JSON.stringify(data.data.cateItem));
           }
         } catch (error) {
           console.error('Error fetching business items:', error);
         }
       };
 
-      // Fetch categories from the new API
       const fetchCategories = async () => {
         try {
+          // Kiểm tra cache trước
+          const cachedData = localStorage.getItem('categories');
+          if (cachedData) {
+            setCategories(JSON.parse(cachedData));
+            return;
+          }
+
           const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/common/list-category?type=1&page=0&size=10');
           const data = await response.json();
           if (data.code === 200) {
             setCategories(data.data);
+            // Lưu vào cache
+            localStorage.setItem('categories', JSON.stringify(data.data));
           }
         } catch (error) {
           console.error('Error fetching categories:', error);

@@ -71,10 +71,19 @@ export default function Home() {
   useEffect(() => {
     const fetchTrendingItems = async () => {
       try {
+        // Kiểm tra cache trước
+        const cachedData = localStorage.getItem('podcast_trending_items');
+        if (cachedData) {
+          setTrendingItems(JSON.parse(cachedData));
+          return;
+        }
+
         const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/common/trending?type=0&page=0&size=10');
         const data = await response.json();
         if (data.code === 200) {
           setTrendingItems(data.data);
+          // Lưu vào cache
+          localStorage.setItem('podcast_trending_items', JSON.stringify(data.data));
         }
       } catch (error) {
         console.error('Error fetching trending items:', error);
@@ -83,10 +92,19 @@ export default function Home() {
 
     const fetchSpiritualItems = async () => {
       try {
+        // Kiểm tra cache trước
+        const cachedData = localStorage.getItem('podcast_spiritual_items');
+        if (cachedData) {
+          setSpiritualItems(JSON.parse(cachedData));
+          return;
+        }
+
         const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/common/category?sort=date:desc&page=0&size=10&type=0');
         const data = await response.json();
         if (data.code === 200) {
           setSpiritualItems(data.data.cateItem);
+          // Lưu vào cache
+          localStorage.setItem('podcast_spiritual_items', JSON.stringify(data.data.cateItem));
         }
       } catch (error) {
         console.error('Error fetching spiritual items:', error);
@@ -95,10 +113,19 @@ export default function Home() {
 
     const fetchBusinessItems = async () => {
       try {
+        // Kiểm tra cache trước
+        const cachedData = localStorage.getItem('podcast_business_items');
+        if (cachedData) {
+          setBusinessItems(JSON.parse(cachedData));
+          return;
+        }
+
         const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/common/category?sort=date:desc&page=0&size=10&type=0');
         const data = await response.json();
         if (data.code === 200) {
           setBusinessItems(data.data.cateItem);
+          // Lưu vào cache
+          localStorage.setItem('podcast_business_items', JSON.stringify(data.data.cateItem));
         }
       } catch (error) {
         console.error('Error fetching business items:', error);
@@ -107,15 +134,29 @@ export default function Home() {
 
     const fetchNewBooks = async () => {
       try {
+        // Kiểm tra cache trước
+        const cachedData = localStorage.getItem('podcast_new_books');
+        if (cachedData) {
+          const parsedData = JSON.parse(cachedData);
+          setNewBooks(parsedData);
+          if (parsedData.length > 1) {
+            setSelectedBookIndex(1);
+          } else if (parsedData.length === 1) {
+            setSelectedBookIndex(0);
+          }
+          return;
+        }
+
         const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/common/category?sort=date:desc&page=0&size=10&type=0');
         const data = await response.json();
         if (data.code === 200) {
           setNewBooks(data.data.cateItem);
-          // Khi dữ liệu sách mới được tải, đặt sách thứ hai (index 1) làm mặc định
+          // Lưu vào cache
+          localStorage.setItem('podcast_new_books', JSON.stringify(data.data.cateItem));
           if (data.data.cateItem.length > 1) {
             setSelectedBookIndex(1);
           } else if (data.data.cateItem.length === 1) {
-            setSelectedBookIndex(0); // Nếu chỉ có 1 sách, chọn sách đó
+            setSelectedBookIndex(0);
           }
         }
       } catch (error) {
@@ -123,27 +164,32 @@ export default function Home() {
       }
     };
 
-    // Fetch categories from the new API
     const fetchCategories = async () => {
       try {
+        // Kiểm tra cache trước
+        const cachedData = localStorage.getItem('podcast_categories');
+        if (cachedData) {
+          setCategories(JSON.parse(cachedData));
+          return;
+        }
+
         const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/common/list-category?type=0&page=0&size=10');
         const data = await response.json();
         if (data.code === 200) {
-          setCategories(data.data); // Set categories state with fetched data
-        } else {
-          console.error('Error fetching categories:', data.message);
+          setCategories(data.data);
+          // Lưu vào cache
+          localStorage.setItem('podcast_categories', JSON.stringify(data.data));
         }
       } catch (error) {
         console.error('Error fetching categories:', error);
       }
     };
 
-
     fetchTrendingItems();
     fetchSpiritualItems();
     fetchBusinessItems();
     fetchNewBooks();
-    fetchCategories(); // Fetch categories
+    fetchCategories();
   }, []);
 
   // useEffect để xử lý việc căn giữa sách mới

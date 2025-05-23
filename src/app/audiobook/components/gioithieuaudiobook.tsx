@@ -29,11 +29,29 @@ interface RatingData {
 }
 
 const fetcher = async (url: string) => {
+  // Kiểm tra cache trước khi gọi API
+  const cachedData = localStorage.getItem(url);
+  if (cachedData) {
+    const { data, timestamp } = JSON.parse(cachedData);
+    // Kiểm tra xem cache có hết hạn chưa (ví dụ: 5 phút)
+    if (Date.now() - timestamp < 5 * 60 * 1000) {
+      return data;
+    }
+    // Nếu hết hạn, xóa cache
+    localStorage.removeItem(url);
+  }
+
+  // Nếu không có cache hoặc cache đã hết hạn, gọi API
   const response = await fetch(url, {
     headers: { 'userId': '1' }
   });
   const data = await response.json();
   if (data.code === 200) {
+    // Lưu data vào cache với timestamp
+    localStorage.setItem(url, JSON.stringify({
+      data: data.data,
+      timestamp: Date.now()
+    }));
     return data.data;
   }
   throw new Error('Không thể kết nối đến server');
@@ -139,9 +157,9 @@ export default function GioiThieu() {
             <div key={`${rating.userId}-${index}`} className="bg-[#1F222A] p-4 rounded-lg">
               <div className="flex gap-3 items-center mb-2">
                 <img 
-                  src={rating.avatar} 
+                  src="/app.body/tacgia.png" 
                   alt={rating.name} 
-                  className="object-cover w-8 h-8 rounded-full"
+                  className="object-cover w-10 h-10 rounded-full"
                 />
                 <div className="flex-1">
                   <div className="flex justify-between items-center">

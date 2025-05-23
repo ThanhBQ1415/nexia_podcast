@@ -54,11 +54,20 @@ export default function CategoryListPage() {
   useEffect(() => {
     const fetchCategoryList = async () => {
       try {
+        // Kiểm tra cache trước
+        const cachedData = localStorage.getItem('audiobook_category_list');
+        if (cachedData) {
+          setCategories([{ id: 0, title: 'Tất cả' }, ...JSON.parse(cachedData)]);
+          return;
+        }
+
         const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/common/list-category?type=1&page=0&size=10');
         const data = await response.json();
         if (data.code === 200) {
           // Add 'Tất cả' option at the beginning
-          setCategories([{ id: 0, title: 'Tất cả' }, ...data.data]); // Assuming 'all' corresponds to id 0 or similar logic
+          setCategories([{ id: 0, title: 'Tất cả' }, ...data.data]);
+          // Lưu vào cache
+          localStorage.setItem('audiobook_category_list', JSON.stringify(data.data));
         } else {
           console.error('Error fetching category list:', data.message);
         }
@@ -68,7 +77,7 @@ export default function CategoryListPage() {
     };
 
     fetchCategoryList();
-  }, []); // Fetch category list only once on mount
+  }, []);
 
   useEffect(() => {
     const fetchCategoryItems = async () => {
@@ -84,20 +93,18 @@ export default function CategoryListPage() {
         // Luôn lấy dữ liệu theo id:asc để đảm bảo thứ tự nhất quán
         url += '&sort=id:asc';
 
-        console.log('Fetching URL:', url);
+        // Tạo cache key dựa trên URL để lưu trữ riêng cho mỗi category
+        const cacheKey = `audiobook_category_items_${activeTab}`;
 
-        const response = await fetch(url);
-        const data = await response.json();
-        if (data.code === 200) {
-          const items = data.data.cateItem;
-
+        // Kiểm tra cache trước
+        const cachedData = localStorage.getItem(cacheKey);
+        if (cachedData) {
+          const items = JSON.parse(cachedData);
           setOriginalItems(items);
-
-
           let sortedItems = [...items];
 
+      
           if (sortBy === 'newest') {
-
             sortedItems = sortedItems.sort((a, b) => {
               const [da, ma, ya] = a.publisherDate.split('/').map(Number);
               const [db, mb, yb] = b.publisherDate.split('/').map(Number);
@@ -105,9 +112,7 @@ export default function CategoryListPage() {
               const dateB = new Date(yb, mb - 1, db);
               return dateB.getTime() - dateA.getTime();
             });
-            console.log('Danh sách sau khi sắp xếp mới nhất:', sortedItems);
           } else if (sortBy === 'oldest') {
-
             sortedItems = sortedItems.sort((a, b) => {
               const [da, ma, ya] = a.publisherDate.split('/').map(Number);
               const [db, mb, yb] = b.publisherDate.split('/').map(Number);
@@ -115,10 +120,40 @@ export default function CategoryListPage() {
               const dateB = new Date(yb, mb - 1, db);
               return dateA.getTime() - dateB.getTime();
             });
-            console.log('Danh sách sau khi sắp xếp cũ nhất:', sortedItems);
-          } else {
-            // Nếu là 'all', sử dụng danh sách gốc
-            console.log('Hiển thị danh sách gốc:', sortedItems);
+          }
+
+          setCategoryItems(sortedItems);
+          return;
+        }
+
+        const response = await fetch(url);
+        const data = await response.json();
+        if (data.code === 200) {
+          const items = data.data.cateItem;
+          setOriginalItems(items);
+
+          // Lưu vào cache
+          localStorage.setItem(cacheKey, JSON.stringify(items));
+
+          let sortedItems = [...items];
+
+
+          if (sortBy === 'newest') {
+            sortedItems = sortedItems.sort((a, b) => {
+              const [da, ma, ya] = a.publisherDate.split('/').map(Number);
+              const [db, mb, yb] = b.publisherDate.split('/').map(Number);
+              const dateA = new Date(ya, ma - 1, da);
+              const dateB = new Date(yb, mb - 1, db);
+              return dateB.getTime() - dateA.getTime();
+            });
+          } else if (sortBy === 'oldest') {
+            sortedItems = sortedItems.sort((a, b) => {
+              const [da, ma, ya] = a.publisherDate.split('/').map(Number);
+              const [db, mb, yb] = b.publisherDate.split('/').map(Number);
+              const dateA = new Date(ya, ma - 1, da);
+              const dateB = new Date(yb, mb - 1, db);
+              return dateA.getTime() - dateB.getTime();
+            });
           }
 
           setCategoryItems(sortedItems);

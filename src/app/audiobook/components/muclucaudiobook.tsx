@@ -32,6 +32,22 @@ const MucLuc = () => {
     const fetchChapters = async () => {
       if (!bookId) return;
       
+      const cacheKey = `audiobook_chapters_${bookId}`;
+      
+      // Kiểm tra cache trước
+      const cachedData = localStorage.getItem(cacheKey);
+      if (cachedData) {
+        const { data, timestamp } = JSON.parse(cachedData);
+        // Kiểm tra xem cache có hết hạn chưa (ví dụ: 5 phút)
+        if (Date.now() - timestamp < 5 * 60 * 1000) {
+          setChapters(data);
+          setLoading(false);
+          return;
+        }
+        // Nếu hết hạn, xóa cache
+        localStorage.removeItem(cacheKey);
+      }
+      
       try {
         setLoading(true);
         const response = await fetch(`http://192.168.1.88:8386/nexia-service/v1/common/toc?page=0&size=10&type=1&id=${bookId}`, {
@@ -42,6 +58,11 @@ const MucLuc = () => {
         const data = await response.json();
         
         if (data.code === 200) {
+          // Lưu data vào cache với timestamp
+          localStorage.setItem(cacheKey, JSON.stringify({
+            data: data.data,
+            timestamp: Date.now()
+          }));
           setChapters(data.data);
         } else {
           setError(data.message || 'Có lỗi xảy ra khi tải mục lục');

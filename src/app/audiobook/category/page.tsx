@@ -10,7 +10,7 @@ interface Category {
 
 export default function CategoryPage() {
   const router = useRouter();
-  const [categories, setCategories] = useState<Category[]>([]); // Initialize as empty array
+  const [categories, setCategories] = useState<Category[]>([]);
 
   // Define border colors to cycle through
   const borderColors = [
@@ -26,10 +26,19 @@ export default function CategoryPage() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
+        // Kiểm tra cache trước
+        const cachedData = localStorage.getItem('audiobook_categories');
+        if (cachedData) {
+          setCategories(JSON.parse(cachedData));
+          return;
+        }
+
         const response = await fetch('http://192.168.1.88:8386/nexia-service/v1/common/list-category?type=1&page=0&size=10');
         const data = await response.json();
         if (data.code === 200) {
-          setCategories(data.data); // Set categories state with fetched data
+          setCategories(data.data);
+          // Lưu vào cache
+          localStorage.setItem('audiobook_categories', JSON.stringify(data.data));
         } else {
           console.error('Error fetching categories:', data.message);
         }
@@ -39,7 +48,7 @@ export default function CategoryPage() {
     };
 
     fetchCategories();
-  }, []); // Empty dependency array means this runs once on mount
+  }, []);
 
 
   const handleBack = () => {
